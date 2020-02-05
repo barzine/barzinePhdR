@@ -1,0 +1,73 @@
+---
+title: "Various function examples"
+author: "Mitra Barzine"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Startpoint}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{barzinePhdData}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(barzinePhdR)
+library(barzinePhdData)
+```
+
+```{r dataPrep}
+data("pandey.ppkm")
+data("uhlen.cuff")
+data("gtex.cuff")
+
+data("g.Pcoding")
+
+genesList<-union(g.Pcoding,rownames(pandey.ppkm))
+```
+
+```{r}
+pandey <- strip(pandey.ppkm)
+uhlen  <- strip(uhlen.cuff)
+gtex   <- strip(gtex.cuff)
+
+
+uhlen<-uhlen[rownames(uhlen) %in% genesList,]
+gtex<-gtex[rownames(gtex) %in% genesList,]
+
+comCond<-Intersect(colnames(pandey),colnames(uhlen),colnames(gtex))
+comCond
+
+
+pandey <- pandey[,comCond]
+uhlen  <- uhlen[,comCond]
+gtex   <- gtex[,comCond]
+
+
+uhlen<-crudeStrip(uhlen,1)
+gtex<-crudeStrip(gtex,1)
+
+```
+
+```{r speData}
+pandey.spe <- selectSpecific(pandey)
+uhlen.spe  <- selectSpecific(uhlen,threshold=1)
+gtex.spe   <- selectSpecific(gtex,threshold=1)
+```
+```{r, eval=FALSE}
+List[Spe_pandey_uhlen_OverlapPercent,Spe_pandey_uhlen_OverlappValue]<-matrix.overlap_res(pandey.spe,uhlen.spe,report="")
+```
+
+
+
+
+
+
+
+

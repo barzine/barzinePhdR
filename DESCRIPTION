@@ -1,0 +1,51 @@
+Package: barzinePhdR
+Title: Code developed while and for my PhD thesis at the EMBL-EBI
+Version: 0.0
+Authors@R: 
+    person(given = "Mitra",
+           family = "Barzine",
+           role = c("aut", "cre"),
+           email = "mitra.barzine@gmail.com",
+           comment = c(ORCID = "https://orcid.org/0000-0002-0860-9510"))
+Description: All R code necessary to reproduce analyses and figures presented in the PhD thesis:
+             Investigating Normal Human Gene Expression in Tissues
+             with High-throughput Transcriptomic and Proteomic data.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 2.10),
+         ggplot2
+Imports:
+    reshape2,
+    stats,
+    VennDiagram,
+    gridExtra,
+    methods,
+    grDevices,
+    gplots,
+    utils,
+    tools,
+    parallel,
+    xtable,
+    DT,
+    biomaRt,
+    data.table,
+    knitr,
+    mgcv,
+    ggthemes,
+    ggrepel,
+    RColorBrewer,
+    GOSim,
+    clusterProfiler,
+    ape,
+    gridBase,
+    WGCNA
+Remotes:
+    klmr/modules
+RoxygenNote: 6.1.1
+Suggests:
+    testthat (>= 2.1.0),
+    rmarkdown,
+    barzinePhdData,
+    modules
+VignetteBuilder: knitr
