@@ -1,4 +1,4 @@
-# barzinePhdR ![Build Status](https://travis-ci.com/barzine/barzinePhdR.svg?branch=master)[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/barzine/barzinePhdR?branch=master&svg=true)](https://ci.appveyor.com/project/barzine/barzinePhdR)
+# barzinePhdR ![Build Status](https://travis-ci.com/barzine/barzinePhdR.svg?branch=master)
 ---
 
 All the code developed for my doctoral work
