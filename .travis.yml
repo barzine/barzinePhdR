@@ -1,1 +1,7 @@
 language: r
+r:
+  - bioc-devel
+
+cache: packages
+bioc_required: true
+bioc_use_devel: true
