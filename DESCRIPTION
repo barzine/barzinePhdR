@@ -41,7 +41,7 @@ Imports:
     gridBase,
     WGCNA
 Remotes:
-    klmr/modules
+    klmr/modules,
     barzine/barzinePhdData
 RoxygenNote: 6.1.1
 Suggests:
