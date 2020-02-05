@@ -210,7 +210,7 @@ completeDF.t_test.CorrMat_identical.vs.different<-function(CorrMat,label.A,label
                                                   publish=TRUE,QuantMet,datasets,CorrelationMethod){
 
 
-  newDF<-t.test.CorrMat_identical.vs.different(CorrMat,label.A=label.A,label.B=label.B,
+  newDF<-t_test.CorrMat_identical.vs.different(CorrMat,label.A=label.A,label.B=label.B,
                                                report=report,index=index,output='DFtest',
                                                publish=publish)
   newDF$Tissue.Nb<-base::ncol(CorrMat)
@@ -228,7 +228,8 @@ completeDF.t_test.CorrMat_identical.vs.different<-function(CorrMat,label.A,label
 #'
 #' @param Mat correlation matrix between two studies tissue expression (column correlation)
 #' @param yLab character string. Title of the y-axis
-#' @param label.diag character string. Label for the pairs in the lower.triangle of the matrix.
+#' @param label.diag character string. Label for the pairs in the diagonal of the matrix.
+#' @param label.low.tri character string. Label for the pairs in the lower.triangle of the matrix.
 #' @param xLab character string. Title of the x-axis. Default: 'Type'.
 #' @param pval boolean. Default: TRUE. Whether to add the p-value on the plot.
 #' @param showMean boolean. Default: TRUE. Whether to add the mean of each group on the plot.

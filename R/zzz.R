@@ -1,4 +1,7 @@
 .onLoad <- function(libname, pkgname) {
   initialise()
-  WGCNA::allowWGCNAThreads()
+}
+
+.onAttach<-function(libname, pkgname){
+  packageStartupMessage("initialise WGCNA::allowWGCNAThreads() to allow for multi-threading")
 }

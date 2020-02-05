@@ -15,7 +15,9 @@ t_test.Mat_identical.vs.different(Mat, yLab,
 
 \item{yLab}{character string. Title of the y-axis}
 
-\item{label.diag}{character string. Label for the pairs in the lower.triangle of the matrix.}
+\item{label.diag}{character string. Label for the pairs in the diagonal of the matrix.}
+
+\item{label.low.tri}{character string. Label for the pairs in the lower.triangle of the matrix.}
 
 \item{xLab}{character string. Title of the x-axis. Default: 'Type'.}
 
