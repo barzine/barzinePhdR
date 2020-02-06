@@ -26,7 +26,7 @@ environment:
       USE_RTOOLS: true
   matrix:
     - configuration: 3.6
-      R_VERSION: 3.6.1
+      R_VERSION: 3.6.2
       WARNINGS_ARE_ERRORS: false
 
 # Adapt as necessary starting from here
