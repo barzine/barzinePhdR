@@ -5,3 +5,6 @@ r:
 cache: packages
 bioc_required: true
 bioc_use_devel: true
+
+warnings_are_errors: false
+latex: false
