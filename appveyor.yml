@@ -18,20 +18,25 @@ environment:
   # see https://github.com/krlmlr/r-appveyor#readme for details
   # USE_RTOOLS: true
   # R_REMOTES_STANDALONE: true
-    global:
-      WARNINGS_ARE_ERRORS: false
+  global:
       _R_CHECK_FORCE_SUGGESTS_: false
-      R_COMPILE_AND_INSTALL_PACKAGES: always
+      BIOC_USE_DEVEL: "FALSE"
+      GCC_PATH: mingw_64
       R_ARCH: x64
       USE_RTOOLS: true
-      PKGTYPE: both
-    matrix:
-      - R_VERSION: release
+  matrix:
+    - configuration: 3.6
+      R_VERSION: 3.6.1
+      WARNINGS_ARE_ERRORS: false
 
 # Adapt as necessary starting from here
+matrix:
+  fast_finish: true
 
 build_script:
   - R -e source('https://install-github.me/r-lib/remotes')
+  - travis-tool.sh install_bioc biomaRt GOSim clusterProfiler
+  - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_deps
 
 test_script:
