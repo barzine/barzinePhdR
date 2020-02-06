@@ -10,7 +10,7 @@ Authors@R:
 Description: All R code necessary to reproduce analyses and figures presented in the PhD thesis:
              Investigating Normal Human Gene Expression in Tissues
              with High-throughput Transcriptomic and Proteomic data.
-License: MIT + file LICENSE
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10),
@@ -18,13 +18,14 @@ Depends: R (>= 2.10),
 Imports:
     reshape2,
     stats,
+    graphics,
     VennDiagram,
     gridExtra,
     methods,
     grDevices,
-    gplots,
     utils,
     tools,
+    gtools,
     parallel,
     xtable,
     DT,

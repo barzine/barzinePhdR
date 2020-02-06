@@ -27,7 +27,7 @@ This should be (an unambiguous abbreviation of) one of "ward.D", "ward.D2", "sin
 
 \item{notecol}{character string. Name of the colour to use for the annotation within the heatmap.}
 
-\item{col}{function to be used to define the colour palette for gplots::heatmap.2
+\item{col}{function to be used to define the colour palette for (gplots) heatmap.2
 default: colorRampPalette(c('aliceblue','darkcyan'))}
 
 \item{threshold}{numeric. Default: 0}

@@ -6,15 +6,16 @@
 #'
 #'
 #' @importFrom reshape2 melt dcast
-#' @importFrom stats t.test phyper setNames na.omit hclust relevel as.dist as.formula binom.test pbinom sd aggregate
-#' @importFrom utils combn read.table
+#' @importFrom stats t.test phyper setNames na.omit hclust relevel as.dist as.formula binom.test pbinom sd aggregate order.dendrogram as.dendrogram density dist median reorder is.leaf quantile rexp var
+#' @importFrom utils combn read.table str
 #' @importFrom grid textGrob gpar gTree grid.text pushViewport popViewport
-#' @importFrom grDevices rgb colorRampPalette cairo_pdf dev.off
-#' @importFrom gplots heatmap.2
+#' @importFrom grDevices rgb colorRampPalette cairo_pdf dev.off dev.flush dev.hold col2rgb
+#' @importFrom graphics abline axis hist image layout lines mtext par plot.new rect strheight strwidth text title plot segments points polygon
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom ggthemes geom_rangeframe
 #' @importFrom WGCNA cor
+#' @importFrom gtools invalid odd
 #' @export
 #'
 initialise<-function(){

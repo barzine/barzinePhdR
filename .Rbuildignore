@@ -4,3 +4,4 @@
 ^Meta$
 ^\.travis\.yml$
 ^appveyor\.yml$
+^LICENSE\.md$

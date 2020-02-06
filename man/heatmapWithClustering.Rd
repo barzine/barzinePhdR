@@ -23,7 +23,7 @@ Name of the first data.frame used for the correlation matrix}
 \item{out.B}{character string for the plot (y-axis).
 Name of the second data.frame used for the correlation matrix}
 
-\item{dend}{character string that correspond to \code{\link[gplots]{heatmap.2}} "dendrogram"
+\item{dend}{character string that correspond to (gplots) heatmap.2 "dendrogram"
 indicating whether to draw 'none', 'row', 'column' or 'both' dendrograms.
 Defaults to 'both'. However, if Rowv (or Colv) is FALSE or NULL and dendrogram is 'both',
 then a warning is issued and Rowv (or Colv) arguments are honoured.}
@@ -34,7 +34,7 @@ then a warning is issued and Rowv (or Colv) arguments are honoured.}
 \item{col}{color palette to use; default barzinePhdR::colC(),
 i.e. grDevices::colorRampPalette('aliceblue','darkcyan')}
 
-\item{...}{other parameters that can be handled by \code{\link[gplots]{heatmap.2}}}
+\item{...}{other parameters that can be handled by (gplots) heatmap.2}
 
 \item{report}{boolean. Default: TRUE. Output additional text (example for an (r)html report)}
 

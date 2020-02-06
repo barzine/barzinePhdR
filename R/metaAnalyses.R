@@ -503,7 +503,7 @@ overlapSpeProtmRNA<-function(DFprot,DFmRNA,pretreatment=FALSE,
 #'               "complete", "average" (= UPGMA), "mcquitty" (= WPGMA),
 #'               "median" (= WPGMC) or "centroid" (= UPGMC).
 #' @param notecol character string. Name of the colour to use for the annotation within the heatmap.
-#' @param col function to be used to define the colour palette for gplots::heatmap.2
+#' @param col function to be used to define the colour palette for (gplots) heatmap.2
 #'            default: colorRampPalette(c('aliceblue','darkcyan'))
 #' @param threshold numeric. Default: 0
 #' @param ... for labelling purposes
@@ -614,10 +614,10 @@ tissuesDistance<-function(DF,nbOfTissues=2,ColN,gid=FALSE,plot=FALSE,
 #'               "complete", "average" (= UPGMA), "mcquitty" (= WPGMA),
 #'               "median" (= WPGMC) or "centroid" (= UPGMC).
 #' @param notecol character string. Name of the colour to use for the annotation within the heatmap.
-#' @param col function to be used to define the colour palette for gplots::heatmap.2
+#' @param col function to be used to define the colour palette for (gplots) heatmap.2
 #'            default: colorRampPalette(c('aliceblue','darkcyan'))
 #'
-#' @return a heatmap (based on gplots::heatmap.2)
+#' @return a heatmap (based on (gplots) heatmap.2)
 #' @export
 #'
 plotTissuesDistance<-function(DF,method='ward.D',notecol='gray37',
@@ -1068,11 +1068,11 @@ topgenes.corClusterDraw_log<-function(a,b,filta=NA,same=FALSE,filtb=NA,top=0,
     tmp<-paste(tmp,'_',sep="")
     png(file=paste(tmp,paste(method,"_CorClust_log2.png",sep=""),sep=""), bg="transparent")
     graphics::par(oma=c(2.5,2.5,2.5,2.5))
-    gplots::heatmap.2(new, distfun=function(c) as.dist(1 - c), trace="none", dendrogram="row", col=col)
+    heatmap.2(new, distfun=function(c) as.dist(1 - c), trace="none", dendrogram="row", col=col)
     dev.off()
   }else{
     graphics::par(oma=c(2.5,2.5,2.5,2.5))
-    gplots::heatmap.2(new, distfun=function(c) as.dist(1 - c), trace="none", dendrogram="row", col=col)
+    heatmap.2(new, distfun=function(c) as.dist(1 - c), trace="none", dendrogram="row", col=col)
   }
   return(new)
 }

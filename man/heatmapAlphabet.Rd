@@ -35,7 +35,7 @@ i.e. grDevices::colorRampPalette('aliceblue','darkcyan')}
 \item{margins}{numeric vector of length 2 containing the margins
 (see par(mar= *)) for column and row names, respectively.}
 
-\item{...}{other parameters that can be handled by \code{\link[gplots]{heatmap.2}}}
+\item{...}{other parameters that can be handled by (gplots) heatmap.2}
 
 \item{report}{boolean. Default: TRUE. Output additional text (example for an (r)html report)}
 

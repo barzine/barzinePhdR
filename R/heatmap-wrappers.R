@@ -11,13 +11,13 @@
 #'              Name of the second data.frame used for the correlation matrix
 #' @param col color palette to use; default barzinePhdR::colC(),
 #'            i.e. grDevices::colorRampPalette('aliceblue','darkcyan')
-#' @param dend character string that correspond to \code{\link[gplots]{heatmap.2}} "dendrogram"
+#' @param dend character string that correspond to (gplots) heatmap.2 "dendrogram"
 #'             indicating whether to draw 'none', 'row', 'column' or 'both' dendrograms.
 #'             Defaults to 'both'. However, if Rowv (or Colv) is FALSE or NULL and dendrogram is 'both',
 #'             then a warning is issued and Rowv (or Colv) arguments are honoured.
 #' @param margins numeric vector of length 2 containing the margins
 #'                (see par(mar= *)) for column and row names, respectively.
-#' @param ... other parameters that can be handled by \code{\link[gplots]{heatmap.2}}
+#' @param ... other parameters that can be handled by (gplots) heatmap.2
 #' @param report boolean. Default: TRUE. Output additional text (example for an (r)html report)
 #' @param index character string. default:"####" Allows to customise the level of indexing through markdown tags.
 #'
@@ -58,7 +58,7 @@ heatmapWithClustering<-function(data,label.A,label.B,out.A,out.B,dend='none',
 #' @param key boolean. default: TRUE. Whether the key of the heatmap should also be drawn.
 #' @param margins numeric vector of length 2 containing the margins
 #'                (see par(mar= *)) for column and row names, respectively.
-#' @param ... other parameters that can be handled by \code{\link[gplots]{heatmap.2}}
+#' @param ... other parameters that can be handled by (gplots) heatmap.2
 #' @param report boolean. Default: TRUE. Output additional text (example for an (r)html report)
 #' @param index character string. default:"####" Allows to customise the level of indexing through markdown tags.
 #' @param annot boolean; default: TRUE.
@@ -153,7 +153,7 @@ heatmapAlphabet<-function(data,label.A,label.B,out.A,out.B,col=barzinePhdR::colC
 #'            i.e. grDevices::colorRampPalette('aliceblue','darkcyan')
 #' @param margins numeric vector of length 2 containing the margins
 #'                (see par(mar= *)) for column and row names, respectively.
-#' @param ... other parameters that can be handled by \code{\link[gplots]{heatmap.2}}
+#' @param ... other parameters that can be handled by (gplots) heatmap.2
 #' @param report boolean. Default: TRUE. Output additional text (example for an (r)html report)
 #' @param index character string. default:"####" Allows to customise the level of indexing through markdown tags.
 #' @param annot character string. Default: 'diag'. Annotate only the diagonal of the heatmap
