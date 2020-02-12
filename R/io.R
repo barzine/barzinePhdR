@@ -279,6 +279,19 @@ wtDF<-function(DF,filename,path,
 
 # Helper functions -------------------------------------
 
+#' Convert all missing values to 0
+#'
+#' @param DF numeric data.frame or vector
+#' @param missingVal value to change to 0
+#'
+#' @return a data.frame with no missing value
+#' @export
+#'
+NAto0<-function(DF,missingVal=NA){
+  DF[is.na(DF)]<-0
+  return(DF)
+}
+
 #' Creates a two-column data.frame from a named vector where the column names are repeated in the first column
 #'
 #' @param filename Name of the file which comprises a named vector
