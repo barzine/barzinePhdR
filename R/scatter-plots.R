@@ -209,7 +209,7 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
     p2 <- p2 + scale_fill_manual(values=scaleCol)
   if(publi)   p2<- p2 +theme_bw(base_family=family, base_size=policeSize) +theme(panel.border=element_rect(linetype=NULL,colour=NA))
 
-  p2 <- p2 + geom_histogram(aes(y=(stat(count))),binwidth=binx)
+  p2 <- p2 + geom_histogram(aes(y=..count..),binwidth=binx)
   p2 <- p2 + coord_cartesian(xlim=c(xmin,xmax))
   p2 <- p2 + theme(axis.title.y=element_blank(), axis.title.x=element_blank())
   p2 <- p2 + scale_y_reverse()
@@ -223,7 +223,7 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
     p3 <- p3+  scale_fill_manual(values=scaleCol)
   if(publi)   p3<-p3+theme_bw(base_family=family, base_size=policeSize) +theme(panel.border=element_rect(linetype=NULL,colour=NA))
 
-  p3 <- p3 + geom_histogram(aes(y=(stat(count))),binwidth=biny)
+  p3 <- p3 + geom_histogram(aes(y=..count..),binwidth=biny)
   p3 <- p3 + theme(axis.title.y=element_blank(), axis.title.x=element_blank())
   p3 <- p3 + scale_y_reverse()
   p3 <- p3 + theme(axis.text.x  = element_text(angle=90, vjust=0,hjust=1))
@@ -254,7 +254,7 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
   )
 }
 
-#' Scatter plot of two columns of a data.frame after log2 transformation.
+#' Scatter plot of two columns of a data.frame after possible log2 transformation.
 #'
 #' @param data numeric data.frame
 #' @param x column name to be mapped to the x-axis
@@ -323,21 +323,21 @@ scatplot<-function(data,x,y,title,xlabs,ylabs,min,max,a=0.65,log2=TRUE,
 
   if(missing(xmax)){
     if(missing(max)){
-      xmax <- 15
+      xmax <- base::max(x,y)
     }else{
       xmax<-max
     }
   }
   if(missing(ymax)){
     if (missing(max)) {
-      ymax <- 15
+      ymax <- base::max(y,x)
     }else{
       ymax<-max
     }
   }
   if(missing(xmin)){
     if (missing(min)){
-      xmin <- -2
+      xmin <- base::min(x,y)
     }else{
       xmin <- min
     }
@@ -345,7 +345,7 @@ scatplot<-function(data,x,y,title,xlabs,ylabs,min,max,a=0.65,log2=TRUE,
 
   if(missing(ymin)){
     if (missing(min)){
-      ymin<- -2
+      ymin<- base::min(y,x)
     }else{
       ymin<-min
     }
@@ -447,7 +447,7 @@ scatplot<-function(data,x,y,title,xlabs,ylabs,min,max,a=0.65,log2=TRUE,
     p2 <- p2 + scale_fill_manual(values=scaleCol)
   if(publi)   p2<- p2 +theme_bw() +theme(panel.border=element_rect(linetype=NULL,colour=NA))
 
-  p2 <- p2 + geom_histogram(aes(y=(stat(count))),binwidth=binx)
+  p2 <- p2 + geom_histogram(aes(y=..count..),binwidth=binx)
   p2 <- p2 + coord_cartesian(xlim=c(xmin,xmax))
   p2 <- p2 + theme(axis.title.y=element_blank(), axis.title.x=element_blank())
   p2 <- p2 + scale_y_reverse()
@@ -461,7 +461,7 @@ scatplot<-function(data,x,y,title,xlabs,ylabs,min,max,a=0.65,log2=TRUE,
     p3 <- p3+  scale_fill_manual(values=scaleCol)
   if(publi)   p3<-p3+theme_bw() +theme(panel.border=element_rect(linetype=NULL,colour=NA))
 
-  p3 <- p3 + geom_histogram(aes(y=(stat(count))),binwidth=biny)
+  p3 <- p3 + geom_histogram(aes(y=..count..),binwidth=biny)
   p3 <- p3 + theme(axis.title.y=element_blank(), axis.title.x=element_blank())
   p3 <- p3 + scale_y_reverse()
   p3 <- p3 + theme(axis.text.x  = element_text(angle=45, vjust=0,hjust=1))

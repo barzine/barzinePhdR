@@ -2347,4 +2347,60 @@ barplotCommonGenesUnique3D<-function(a,b,c,name,print=TRUE,
 }
 
 
+#' Plot the genes in common between 2 datasets
+#'
+#' @param a numeric data.frame comprising the first dataset expression data
+#' @param b numeric data.frame comprising the second dataset expression data
+#' @param name a length-2 character string vector. Names of the three datasets.
+#' @param print boolean. Default: TRUE. Whether to print the figure or not.
+#' @param publish boolean. Default: TRUE. Whether to apply ggplot2::theme_bw to the plot.
+#' @param out character string. Default: "plot".
+#'            Allows to pick the object returned by the function.
+#' @param colorpalette vector of character strings to personalise the colours of the plot.
+#' @param thm function of the type of theme(...)
+#' @param xlab character string. Allows to change the label of the x-axis.
+#' @param ylab character string. Allows to change the label of the y-axis.
+#' @param baseSize size of the font. Default: 12. Applied only if "publish"
+#' @param baseFamily name of the font.
+#'                   Default is "Linux Libertine". Applied only if "publish"
+#'
+#' @return depending on the type of "out" can be a data.frame,
+#'         a plot or the data to create the plot
+#' @export
+#'
+barplotCommonGenesUnique2D<-function(a,b,name,print=TRUE,
+                                     publish=TRUE,out='plot',
+                                     colorpalette,thm,xlab,ylab,baseSize=12,
+                                     baseFamily="Linux Libertine"){
 
+  commonCol<-base::intersect(colnames(a),colnames(b))
+  new<-Reduce(rbind,lapply(commonCol, function(x){
+    A<-rownames(a[a[,x]>0,])
+    B<-rownames(b[b[,x]>0,])
+    ab <- Intersect(A,B)
+    ua <- setdiff(A,ab)
+    ub <- setdiff(B,ab)
+
+    rbind(data.frame(Tissue=x,ID=ua,Group=paste(name[1],'only')),
+          data.frame(Tissue=x,ID=ub,Group=paste(name[2],'only')),
+          data.frame(Tissue=x,ID=ab,Group=paste('Both',name[1],'&',name[2]))
+    )
+  }))
+  p <- ggplot(new, aes(x=Tissue))+geom_bar(aes(y=..count..,fill=Group))+coord_flip()
+  if(publish) p<- p+theme_bw(base_size=baseSize,base_family = baseFamily)
+  if(!missing(thm)) p<-p+thm
+  p <- p + theme(legend.position = 'bottom')
+  p <- p + guides(fill=guide_legend(title="Present in",reverse=TRUE))
+  if(!missing(colorpalette)){
+    p <- p + scale_fill_manual(values=colorpalette,drop=FALSE)
+  }
+  if(!missing(xlab))  p<-p+xlab(xlab)
+  if(!missing(ylab))  p<-p+labs(y=ylab)
+  if(print) print(p)
+
+  switch(out,
+         'DF'            = return(new),
+         'plot'          = return(print(p)),
+         'plot_data'     = return(p))
+
+}

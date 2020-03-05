@@ -2,7 +2,7 @@
 % Please edit documentation in R/scatter-plots.R
 \name{scatplot}
 \alias{scatplot}
-\title{Scatter plot of two columns of a data.frame after log2 transformation.}
+\title{Scatter plot of two columns of a data.frame after possible log2 transformation.}
 \usage{
 scatplot(data, x, y, title, xlabs, ylabs, min, max, a = 0.65,
   log2 = TRUE, xcor = 3.3, ycor = 16.999, binx = 0.2, biny = 0.2,
@@ -83,5 +83,5 @@ scatplot(data, x, y, title, xlabs, ylabs, min, max, a = 0.65,
 a plot (see parameter fig for better description)
 }
 \description{
-Scatter plot of two columns of a data.frame after log2 transformation.
+Scatter plot of two columns of a data.frame after possible log2 transformation.
 }

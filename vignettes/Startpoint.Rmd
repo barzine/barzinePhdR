@@ -24,8 +24,8 @@ library(barzinePhdData)
 
 ```{r dataPrep}
 data("pandey.ppkm")
-data("uhlen.cuff")
-data("gtex.cuff")
+data("uhlen.htseq.fpkm.pooled")
+data("gtex.htseq.fpkm.pooled")
 
 data("g.Pcoding")
 
@@ -34,8 +34,8 @@ genesList<-union(g.Pcoding,rownames(pandey.ppkm))
 
 ```{r}
 pandey <- strip(pandey.ppkm)
-uhlen  <- strip(uhlen.cuff)
-gtex   <- strip(gtex.cuff)
+uhlen  <- strip(uhlen.htseq.fpkm.pooled)
+gtex   <- strip(gtex.htseq.fpkm.pooled)
 
 
 uhlen<-uhlen[rownames(uhlen) %in% genesList,]

@@ -204,3 +204,235 @@ heatmapAlpabet<-function(data,label.A,label.B,out.A,out.B,digits,key,
 
 }
 
+
+
+#' Allows to display the correct colour annotation
+#'
+#' @param Names vector of character strings. name of the columns
+#' @param cond vector of character strings. Name of the tissues/conditions to map the columns
+#' @param palette named vector palette. (names are the same as condition)
+#'
+#' @return a properly formatted vector of colours
+#' @export
+#'
+matchColCond<-function(Names,cond,palette){
+  stopifnot(all(cond %in% names(palette)))
+  res<-lapply(Names,function(x){
+    temp<-lapply(cond,function(y){
+      ifelse(grep(y,x,ignore.case = TRUE),return(palette[y]),return(NA))
+    })
+    temp<-temp[!is.na(temp)]
+    return(temp)
+  })
+  return(unlist(res))
+}
+
+#' Wrapper around heatmap.2; allows to annotate with the colours on the side.
+#'
+#' @param DF data.frame or matrix to use for the heatmap
+#' @param method string to pick the method with which to compute the correlation.
+#'               One of "pearson" (default), "kendall", or "spearman"
+#' @param use character string giving a method for computing covariances in the presence of missing values.
+#'            This must be (an abbreviation of) one of the strings
+#'            "everything" (default), "all.obs", "complete.obs", "na.or.complete", or "pairwise.complete.obs".
+#' @param hclustMethod character string. he agglomeration method to be used.
+#'                     This should be (an unambiguous abbreviation of) one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
+#' @param trace character string indicating whether a solid "trace" line should be drawn across 'row's or down 'column's, 'both' or 'none'. The distance of the line from the center of each color-cell is proportional to the size of the measurement. Defaults to 'none'.
+#' @param dendrogram character string indicating whether to draw 'none', 'row', 'column' or 'both' dendrograms. Defaults to 'both'. However, if Rowv (or Colv) is FALSE or NULL and dendrogram is 'both', then a warning is issued and Rowv (or Colv) arguments are honoured.
+#' @param col colors used for the image. Defaults to col=colorRampPalette(c('ghostwhite','darkcyan'))
+#' @param cexRow,cexCol positive numbers, used as cex.axis in for the row or column axis labeling. The defaults currently only use number of rows or columns, respectively.
+#' @param annotate boolean. Whether to add the correlations as annotation on the heatmap
+#' @param signifdigit integer. Number of digit to show for the correlation showed as annotation. Default:1
+#' @param rowsidecolors (optional) character vector of length nrow(x) containing the color names for a vertical side bar that may be used to annotate the rows of x.
+#'                       Otherwise can be created internally
+#' @param colsidecolors (optional) character vector of length ncol(x) containing the color names for a horizontal side bar that may be used to annotate the columns of x.
+#'                      Otherwise can be created internally
+#' @param density.info character string indicating whether to superimpose a 'histogram', a 'density' plot, or no plot ('none') on the color-key.
+#' @param notecol character string. Colour for the annotation
+#' @param ColsideMode character string that allows to create the annotation colours based on the column names
+#'                    one of the following strings: 'match', 'extract' or 'extractSpace'
+#' @param RowsideMode character string that allows to create the annotation colours based on the row names (of the correlation matrix)
+#'                    one of the following strings: 'extract', 'extractSpace', 'extract2' or 'extractSpace2'
+#' @param srtCol angle of column labels, in degrees from horizontal. Default: 45
+#' @param margins numeric vector of length 2 containing the margins (see par(mar= *)) for column and row names, respectively. Default: c(8,12)
+#' @param common.cond argument for matchColCond
+#' @param datasetCol colour palette for the datasets in the form of a named vector
+#' @param TissueCol colour palette for the tissues in the form of a named vector
+#' @param baseFont character string. Allows to pick the font of the figure
+#' @param ... other parameters that can be used by heatmap.2
+#' @param parenthesis boolean. Whether the column names comprises parenthesis
+#' @param key.title main title of the color key. If set to NA no title will be plotted.
+#'
+#' @return a heatmap
+#' @export
+#'
+mHeatmap<-function(DF,method='pearson',use='everything',hclustMethod='ward.D',
+                  trace='none',dendrogram='row',col,cexRow=1,cexCol=1,
+                  annotate=FALSE,signifdigit=1, rowsidecolors,colsidecolors,density.info,
+                  notecol='black',ColsideMode='match',RowsideMode='extract',srtCol=45,
+                  margins=c(12,8),common.cond,datasetCol,TissueCol,baseFont,...,parenthesis=TRUE,key.title){
+
+  if(!missing(baseFont)) op <- par(family = baseFont)
+
+  if (parenthesis) names(datasetCol)<-sapply(names(datasetCol), function(x) paste0('(',x,')'))
+  if(missing(key.title)) key.title=NULL
+
+  if(missing(col)) col=grDevices::colorRampPalette(c('ghostwhite','darkcyan'))
+
+  corDF<-cor(DF,method=method,use=use)
+
+  if(missing(rowsidecolors)){
+    if(RowsideMode=='extract')
+      rowsidecolors=datasetCol[sapply(rownames(corDF),
+                                      function(x){return(unlist(strsplit(x,'\\.')[[1]][2]))})]
+    if(RowsideMode=='extractSpace')
+      rowsidecolors=datasetCol[sapply(rownames(corDF),
+                                      function(x){return(unlist(strsplit(x,' ')[[1]][2]))})]
+    if(RowsideMode=='extract2')
+      rowsidecolors=datasetCol[sapply(rownames(corDF),function(x){
+        return(unlist(strsplit(x,'\\.')[[1]][length(unlist(strsplit(x,'\\.')))]))})]
+    if(RowsideMode=='extractSpace2')
+      rowsidecolors=datasetCol[sapply(rownames(corDF),function(x){
+        return(unlist(strsplit(x,' ')[[1]][length(unlist(strsplit(x,' ')))]))})]
+  }
+
+  if(missing(colsidecolors)){
+    if(ColsideMode=='match')
+      colsidecolors=matchColCond(colnames(corDF),common.cond,TissueCol)
+    if(ColsideMode=='extract')
+      colsidecolors=TissueCol[sapply(rownames(corDF),
+                                     function(x){
+                                       return(unlist(strsplit(x,'\\.')[[1]][1]))})]
+    if(ColsideMode=='extractSpace')
+      colsidecolors=TissueCol[sapply(rownames(corDF),
+                                     function(x){
+                                       return(unlist(strsplit(x,' ')[[1]][1]))})]
+  }
+
+  if(annotate){
+    heatmap.2(corDF,
+              hclustfun = function(x) hclust(x,method=hclustMethod),
+              distfun = function(c) as.dist(1 - c), trace=trace,
+              dendrogram = dendrogram, col=col,
+              cexRow = cexRow, cexCol = cexCol,
+              cellnote=signif(corDF,signifdigit),notecol = 'black',
+              RowSideColors = rowsidecolors,
+              ColSideColors = colsidecolors,
+              srtCol=srtCol,margins=margins,key.xlab = key.title, key.title=NA)
+
+  }else{
+    heatmap.2(corDF,
+              hclustfun = function(x) hclust(x,method=hclustMethod),
+              distfun = function(c) as.dist(1 - c), trace=trace,
+              dendrogram = dendrogram, col=col,
+              cexRow = cexRow, cexCol = cexCol,
+              RowSideColors = rowsidecolors,
+              ColSideColors = colsidecolors,
+              srtCol=srtCol,margins=margins,key.xlab = key.title, key.title=NA,...)
+  }
+}
+
+
+#' Wrapper around heatmap.2; allows to annotate with the colours on the side.
+#' Colours are the transpose of mHeatmap
+#'
+#' @param DF data.frame or matrix to use for the heatmap
+#' @param method string to pick the method with which to compute the correlation.
+#'               One of "pearson" (default), "kendall", or "spearman"
+#' @param use character string giving a method for computing covariances in the presence of missing values.
+#'            This must be (an abbreviation of) one of the strings
+#'            "everything" (default), "all.obs", "complete.obs", "na.or.complete", or "pairwise.complete.obs".
+#' @param hclustMethod character string. he agglomeration method to be used.
+#'                     This should be (an unambiguous abbreviation of) one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
+#' @param trace character string indicating whether a solid "trace" line should be drawn across 'row's or down 'column's, 'both' or 'none'. The distance of the line from the center of each color-cell is proportional to the size of the measurement. Defaults to 'none'.
+#' @param dendrogram character string indicating whether to draw 'none', 'row', 'column' or 'both' dendrograms. Defaults to 'both'. However, if Rowv (or Colv) is FALSE or NULL and dendrogram is 'both', then a warning is issued and Rowv (or Colv) arguments are honoured.
+#' @param col  colors used for the image. Defaults to col=colorRampPalette(c('ghostwhite','darkcyan'))
+#' @param cexRow,cexCol positive numbers, used as cex.axis in for the row or column axis labeling. The defaults currently only use number of rows or columns, respectively.
+#' @param annotate boolean. Whether to add the correlations as annotation on the heatmap
+#' @param signifdigit integer. Number of digit to show for the correlation showed as annotation. Default:1
+#' @param rowsidecolors (optional) character vector of length nrow(x) containing the color names for a vertical side bar that may be used to annotate the rows of x.
+#'                       Otherwise can be created internally
+#' @param colsidecolors (optional) character vector of length ncol(x) containing the color names for a horizontal side bar that may be used to annotate the columns of x.
+#'                      Otherwise can be created internally
+#' @param notecol character string. Colour for the annotation
+#' @param ColsideMode character string that allows to create the annotation colours based on the column names
+#'                    one of the following strings: 'extract', 'extractSpace', 'extract2' or 'extractSpace2'
+#' @param RowsideMode character string that allows to create the annotation colours based on the row names (of the correlation matrix)
+#'                    one of the following strings: 'match', 'extract' or 'extractSpace'
+#' @param srtCol angle of column labels, in degrees from horizontal. Default: 45
+#' @param margins numeric vector of length 2 containing the margins (see par(mar= *)) for column and row names, respectively. Default: c(8,12)
+#' @param common.cond argument for matchColCond
+#' @param datasetCol colour palette for the datasets in the form of a named vector
+#' @param TissueCol colour palette for the tissues in the form of a named vector
+#' @param baseFont character string. Allows to pick the font of the figure
+#' @param ... other parameters that can be used by heatmap.2
+#' @param parenthesis boolean. Whether the column names comprises parenthesis
+#' @param key.title main title of the color key. If set to NA no title will be plotted.
+#'
+#' @return a heatmap
+#' @export
+#'
+mHeatmapTC<-function(DF,method='pearson',use='pairwise.complete.obs',hclustMethod='ward.D',
+                    trace='none',dendrogram='row',col,cexRow=1,cexCol=1,
+                    annotate=FALSE,signifdigit=1, rowsidecolors,colsidecolors,
+                    notecol='black',ColsideMode='match',RowsideMode='extract',srtCol=45,
+                    margins=c(12,8),common.cond,datasetCol,TissueCol,baseFont,...,parenthesis=TRUE,key.title){
+
+  if(!missing(baseFont)) op <- par(family = baseFont)
+  if (parenthesis) names(datasetCol)<-sapply(names(datasetCol), function(x) paste0('(',x,')'))
+  if(missing(key.title)) key.title=NULL
+
+  if(missing(col)) col=grDevices::colorRampPalette(c('ghostwhite','darkcyan'))
+
+  corDF<-cor(DF,method=method,use=use)
+
+  if(missing(colsidecolors)){
+    if(ColsideMode=='extract')
+      colsidecolors=datasetCol[sapply(rownames(corDF),
+                                      function(x){return(unlist(strsplit(x,'\\.')[[1]][2]))})]
+    if(ColsideMode=='extractSpace')
+      colsidecolors=datasetCol[sapply(rownames(corDF),
+                                      function(x){return(unlist(strsplit(x,' ')[[1]][2]))})]
+    if(ColsideMode=='extract2')
+      colsidecolors=datasetCol[sapply(rownames(corDF),function(x){
+        return(unlist(strsplit(x,'\\.')[[1]][length(unlist(strsplit(x,'\\.')))]))})]
+    if(ColsideMode=='extractSpace2')
+      colsidecolors=datasetCol[sapply(rownames(corDF),function(x){
+        return(unlist(strsplit(x,' ')[[1]][length(unlist(strsplit(x,' ')))]))})]
+  }
+
+  if(missing(rowsidecolors)){
+    if(RowsideMode=='match')
+      rowsidecolors=matchColCond(colnames(corDF),common.cond,TissueCol)
+    if(RowsideMode=='extract')
+      rowsidecolors=TissueCol[sapply(rownames(corDF),
+                                     function(x){
+                                       return(unlist(strsplit(x,'\\.')[[1]][1]))})]
+    if(RowsideMode=='extractSpace')
+      rowsidecolors=TissueCol[sapply(rownames(corDF),
+                                     function(x){
+                                       return(unlist(strsplit(x,' ')[[1]][1]))})]
+  }
+
+  if(annotate){
+    heatmap.2(corDF,
+              hclustfun = function(x) hclust(x,method=hclustMethod),
+              distfun = function(c) as.dist(1 - c), trace=trace,
+              dendrogram = dendrogram, col=col,
+              cexRow = cexRow, cexCol = cexCol,
+              cellnote=signif(corDF,signifdigit),notecol = 'black',
+              RowSideColors = rowsidecolors,
+              ColSideColors = colsidecolors,
+              srtCol=srtCol,margins=margins,key.xlab = key.title, key.title=NA, ...)
+
+  }else{
+    heatmap.2(corDF,
+              hclustfun = function(x) hclust(x,method=hclustMethod),
+              distfun = function(c) as.dist(1 - c), trace=trace,
+              dendrogram = dendrogram, col=col,
+              cexRow = cexRow, cexCol = cexCol,
+              RowSideColors = rowsidecolors,
+              ColSideColors = colsidecolors,
+              srtCol=srtCol,margins=margins,key.xlab = key.title, key.title=NA, ...)
+  }
+}

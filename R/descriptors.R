@@ -157,7 +157,7 @@ nbGenesPerCond.unique<-function(DF, reorder=TRUE, xlab='Tissue',ylab,title,legen
     DF$variable<-factor(DF$variable,levels=colNames)#by
   }
 
-  p <- ggplot(DF, aes_string(x="variable"))+geom_bar(aes(y=stat(count),fill=unique))
+  p <- ggplot(DF, aes_string(x="variable"))+geom_bar(aes(y=..count..,fill=unique))
   p <- p + scale_fill_manual(values=uniqNoUniq,drop=FALSE)
   if(publish) p <- p+theme_bw()
   if(!missing(xlab)) p <- p + xlab(xlab)
