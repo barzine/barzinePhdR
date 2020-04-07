@@ -2404,3 +2404,45 @@ barplotCommonGenesUnique2D<-function(a,b,name,print=TRUE,
          'plot_data'     = return(p))
 
 }
+
+
+#' Returns the id (rownames) of the genes that are found in the tissues that have a
+#' breadth of expression equals to or lesser than a given one
+#'
+#' @param DFa data.frame; should be logical can be numeric if comp is TRUE
+#' @param nbMax integer; breadth of expression maximal to consider
+#' @param naCol character string. Name of the column which gives the breadth of expression of each gene
+#'              default: "nb.tissues"
+#' @param comp logical; should the breadth of expression be computed first from a numeric DFa
+#' @param threshold numeric, which cutoff of expression has to be used for considering a gene expressed in a tissue or not
+#' @param omit.zero logical; whether the rows with zeros only should be kept or not
+#' @param type character string. "lim" (default) up to the given number as nbMax, "eq" for the exact breadth given by nbMax
+#'
+#' @return a list that comprises for each column of the inputted data.frame,
+#'         a vector with the rownames of the genes expressed in a maximal number of tissues (given).
+#' @export
+#'
+ExpressedGeneInTissue<-function(DFa,nbMax=2,type="lim",
+                                naCol="nb.tissues",
+                                comp=FALSE,threshold,omit.zero){
+
+  if(comp) DFa<-computeBreadth(DFa,
+                                  threshold=threshold,
+                                  omit.zero=omit.zero,typeR='dfBool')
+
+  if(type=="lim") {
+    DFa<-DFa[DFa[,naCol]<nbMax+1,]
+  }else{#only other option "eq"
+    DFa<-DFa[DFa[,naCol]==nbMax,]
+  }
+  DFa<-DFa[,setdiff(colnames(DFa),naCol)]
+
+  DFList<-lapply(setNames(colnames(DFa),colnames(DFa)),
+                    function(x){
+                      return(rownames(DFa)[DFa[,x]])
+                    })
+
+  return(DFList)
+}
+
+

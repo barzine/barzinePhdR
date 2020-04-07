@@ -61,8 +61,11 @@ heatmapWithClustering<-function(data,label.A,label.B,out.A,out.B,dend='none',
 #' @param ... other parameters that can be handled by (gplots) heatmap.2
 #' @param report boolean. Default: TRUE. Output additional text (example for an (r)html report)
 #' @param index character string. default:"####" Allows to customise the level of indexing through markdown tags.
-#' @param annot boolean; default: TRUE.
-#'              Whether the input data.frame should be rordered alphabetically before being plotted.
+#' @param annot character string. Chose how (if anny annotation) is added to the heatmap
+#'              'diag' (default) for the value of the diagonal;
+#'              'complete' all the values are added on the heatmap;
+#'              'custom' to use the cellAnnot given by user.
+#'              Anything else returns an heatmap that isn't annotated
 #' @param sorting boolean; default: TRUE.
 #'                Whether the input data.frame should be rordered alphabetically before being plotted.
 #' @param notecol character string specifying the color for cellnote text. Defaults to "grey90".
@@ -75,6 +78,7 @@ heatmapWithClustering<-function(data,label.A,label.B,out.A,out.B,dend='none',
 #'               Default: 1.4
 #' @param mathMethod character string that allows to pick how the correlation (in cellnote) should be rounded.
 #'                   Default: "signif"
+#' @param cellAnnot only if annot=="custom", what to be added on top of the heatmap
 #'
 #' @return a heatmap plot
 #' @export
@@ -83,7 +87,7 @@ heatmapAlphabet<-function(data,label.A,label.B,out.A,out.B,col=barzinePhdR::colC
                           digits=1,key,margins,...,report=TRUE,index="####",annot='diag',
                           sorting=TRUE,notecol="grey90",srtCol=45,
                           cexRow=1.4,cexCol=1.4, cex.axis=1.4,
-                          mathMethod='signif'){
+                          mathMethod='signif',cellAnnot){
 
   if(missing(key)) key=TRUE
   if(missing(margins)) margins=c(10,10)
@@ -106,7 +110,10 @@ heatmapAlphabet<-function(data,label.A,label.B,out.A,out.B,col=barzinePhdR::colC
     }
   }
 
-  cellAnnot<-apply(eval(call(name=paste0(mathMethod,'2'),as.matrix(data))),2,as.character)
+  if(missing(cellAnnot)) cellAnnot<-apply(eval(call(name=paste0(mathMethod,'2'),as.matrix(data))),2,as.character)
+
+  if(length(notecol>1)) notecol<-t(notecol)
+
   if(annot=='diag'){
     tmp<-diag(cellAnnot)
     cellAnnot<-matrix(data="",nrow=nrow(data),ncol(data))
@@ -116,20 +123,29 @@ heatmapAlphabet<-function(data,label.A,label.B,out.A,out.B,col=barzinePhdR::colC
               Rowv=FALSE,Colv=FALSE, col=col,
               margins=margins,xlab=out.A,ylab=out.B,key=key,
               cexRow=cexRow,cexCol=cexCol, cex.axis=cex.axis,
-              cellnote=cellAnnot,notecol=notecol,srtCol=srtCol,...)
+              cellnote=t(cellAnnot),notecol=notecol,srtCol=srtCol,...)
   }else{
     if(annot=='complete'){
       heatmap.2(t(as.matrix(data)), trace="none", dendrogram="none",
                 Rowv=FALSE,Colv=FALSE, col=col,
                 cexRow=cexRow,cexCol=cexCol, cex.axis=cex.axis,
                 margins=margins,xlab=out.A,ylab=out.B,key=key,
-                cellnote = cellAnnot,
+                cellnote = t(cellAnnot),
                 notecol=notecol,srtCol=srtCol,...)
     }else{
+      if(annot=='custom'){
+        heatmap.2(t(as.matrix(data)), trace="none", dendrogram="none",
+                  Rowv=FALSE,Colv=FALSE, col=col,
+                  cexRow=cexRow,cexCol=cexCol, cex.axis=cex.axis,
+                  margins=margins,xlab=out.A,ylab=out.B,key=key,
+                  cellnote = t(cellAnnot),
+                  notecol=notecol,srtCol=srtCol,...)
+      }else{
       heatmap.2(t(as.matrix(data)), trace="none", dendrogram="none",
                 Rowv=FALSE,Colv=FALSE, col=col,
                 cexRow=cexRow,cexCol=cexCol, cex.axis=cex.axis,
                 margins=margins,xlab=out.A,ylab=out.B,srtCol=srtCol,...)
+      }
     }
   }
 
@@ -195,7 +211,7 @@ heatmapAlpabet<-function(data,label.A,label.B,out.A,out.B,digits,key,
               Rowv=FALSE,Colv=FALSE, col=col,
               cexRow=1,cexCol=1, cex.axis=1, margins=margins,
               xlab=out.B,ylab=out.A,key=key,
-              cellnote=cellAnnot,notecol="grey90",...)
+              cellnote=t(cellAnnot),notecol="grey90",...)
   }else{
     heatmap.2(t(as.matrix(data)), trace="none", dendrogram="none",
               Rowv=FALSE,Colv=FALSE, col=col,
@@ -318,7 +334,7 @@ mHeatmap<-function(DF,method='pearson',use='everything',hclustMethod='ward.D',
               cellnote=signif(corDF,signifdigit),notecol = 'black',
               RowSideColors = rowsidecolors,
               ColSideColors = colsidecolors,
-              srtCol=srtCol,margins=margins,key.xlab = key.title, key.title=NA)
+              srtCol=srtCol,margins=margins,key.xlab = key.title, key.title=NA,...)
 
   }else{
     heatmap.2(corDF,
@@ -420,7 +436,7 @@ mHeatmapTC<-function(DF,method='pearson',use='pairwise.complete.obs',hclustMetho
               distfun = function(c) as.dist(1 - c), trace=trace,
               dendrogram = dendrogram, col=col,
               cexRow = cexRow, cexCol = cexCol,
-              cellnote=signif(corDF,signifdigit),notecol = 'black',
+              cellnote=signif(corDF,signifdigit),notecol = notecol,
               RowSideColors = rowsidecolors,
               ColSideColors = colsidecolors,
               srtCol=srtCol,margins=margins,key.xlab = key.title, key.title=NA, ...)

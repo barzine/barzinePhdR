@@ -4,8 +4,9 @@
 \alias{compute_tissue_corr_matrix}
 \title{Compute the correlation between two matrices variables( alphabetical order)}
 \usage{
-compute_tissue_corr_matrix(A, B, label.A, label.B, method, report = TRUE,
-  Latex = FALSE, Kable = TRUE, Grid = TRUE, headers = TRUE)
+compute_tissue_corr_matrix(A, B, label.A, label.B, method, log2 = TRUE,
+  report = TRUE, Latex = FALSE, Kable = TRUE, Grid = TRUE,
+  headers = TRUE)
 }
 \arguments{
 \item{A}{numeric data.frame for the first study to compare}
@@ -18,6 +19,8 @@ compute_tissue_corr_matrix(A, B, label.A, label.B, method, report = TRUE,
 
 \item{method}{character string. Method for base::cor, either "pearson", "spearman" or
 "kendall".}
+
+\item{log2}{logical. Default: TRUE. Whether the data should be transform with log2 or not}
 
 \item{report}{boolean. Default:TRUE. Whether to output the result before returning the matrix.}
 

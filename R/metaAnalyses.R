@@ -8,6 +8,7 @@
 #' @param label.B character string. Name of the second study used in the report.
 #' @param method character string. Method for base::cor, either "pearson", "spearman" or
 #'              "kendall".
+#' @param log2 logical. Default: TRUE. Whether the data should be transform with log2 or not
 #' @param report boolean. Default:TRUE. Whether to output the result before returning the matrix.
 #' @param Latex boolean. Default: FALSE. Whether to output in latex format.
 #' @param Kable boolean. Default: TRUE. Whether to report with kable.
@@ -17,7 +18,7 @@
 #' @return a matrix with the columns correlation of the two studies.
 #' @export
 #'
-compute_tissue_corr_matrix<-function(A,B,label.A,label.B,method,
+compute_tissue_corr_matrix<-function(A,B,label.A,label.B,method,log2=TRUE,
                                      report=TRUE,Latex=FALSE,Kable=TRUE,Grid=TRUE,
                                      headers=TRUE){
 
@@ -26,9 +27,15 @@ compute_tissue_corr_matrix<-function(A,B,label.A,label.B,method,
   }
   A<-A[,sort(colnames(A))]
   B<-B[,sort(colnames(B))]
+  if(log2){
   CorrMat<-data.frame(lapply(colnames(B),function(x){
     sapply(colnames(A),function(y){
       cor(log2(A[,y]+1),log2(B[,x]+1),method=method)})}))
+  }else{
+    CorrMat<-data.frame(lapply(colnames(B),function(x){
+      sapply(colnames(A),function(y){
+        cor(A[,y],B[,x],method=method)})}))
+  }
 
   colnames(CorrMat)<-colnames(B)
   if(report){
@@ -1078,6 +1085,26 @@ topgenes.corClusterDraw_log<-function(a,b,filta=NA,same=FALSE,filtb=NA,top=0,
 }
 
 
+# Based on the breadth of expression of the genes as a first step
 
-
+#' Create matrix of jaccard indices based on the output of ExpressedGeneInTissue
+#'
+#' @param DFa data.frame
+#' @param geneList list of the genes found in tissue
+#' @param ... other parameters for ExpressedGeneInTissue
+#'
+#' @return a matrix
+#' @export
+#'
+internalJaccardIndMatrix<-function(DFa,geneList, ...){
+  if(missing(geneList)) geneList<-ExpressedGeneInTissue(DFa, ...)
+  res1<-as.data.frame(t(utils::combn(colnames(DFa),2)),stringsAsFactors = FALSE)
+  res1$val<-sapply(1:nrow(res1),function(x){
+    return(jaccardInd(unlist(geneList[res1[x,1]]),unlist(geneList[res1[x,2]])))
+    })
+  res2<-data.frame("V1"=res1$V2,"V2"=res1$V1,val=res1$val,stringsAsFactors = FALSE)
+  res3<-data.frame("V1"=colnames(DFa),"V2"=colnames(DFa),val=1,stringsAsFactors = FALSE)
+  res<-rbind(res1,res2,res3)
+  return(as.matrix(suppressMessages(reshape2::acast(res, V1~V2))))
+}
 

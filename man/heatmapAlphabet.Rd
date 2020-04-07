@@ -8,7 +8,7 @@ heatmapAlphabet(data, label.A, label.B, out.A, out.B,
   col = barzinePhdR::colCbc(), digits = 1, key, margins, ...,
   report = TRUE, index = "####", annot = "diag", sorting = TRUE,
   notecol = "grey90", srtCol = 45, cexRow = 1.4, cexCol = 1.4,
-  cex.axis = 1.4, mathMethod = "signif")
+  cex.axis = 1.4, mathMethod = "signif", cellAnnot)
 }
 \arguments{
 \item{data}{correlation (numeric) data.frame to plot}
@@ -41,8 +41,11 @@ i.e. grDevices::colorRampPalette('aliceblue','darkcyan')}
 
 \item{index}{character string. default:"####" Allows to customise the level of indexing through markdown tags.}
 
-\item{annot}{boolean; default: TRUE.
-Whether the input data.frame should be rordered alphabetically before being plotted.}
+\item{annot}{character string. Chose how (if anny annotation) is added to the heatmap
+'diag' (default) for the value of the diagonal;
+'complete' all the values are added on the heatmap;
+'custom' to use the cellAnnot given by user.
+Anything else returns an heatmap that isn't annotated}
 
 \item{sorting}{boolean; default: TRUE.
 Whether the input data.frame should be rordered alphabetically before being plotted.}
@@ -62,6 +65,8 @@ Default: 1.4}
 
 \item{mathMethod}{character string that allows to pick how the correlation (in cellnote) should be rounded.
 Default: "signif"}
+
+\item{cellAnnot}{only if annot=="custom", what to be added on top of the heatmap}
 }
 \value{
 a heatmap plot
