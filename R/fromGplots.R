@@ -54,7 +54,7 @@ environment(plotNode) <- environment(here)
 #' @param sepwidth (optional) Vector of length 2 giving the width (colsep) or height (rowsep) the separator box drawn by colsep and rowsep as a function of the width (colsep) or height (rowsep) of a cell. Defaults to c(0.05, 0.05)
 #' @param cellnote (optional) matrix of character strings which will be placed within each color cell, e.g. p-value symbols.
 #' @param notecex (optional) numeric scaling factor for cellnote items.
-#' @param notecol (optional) character string specifying the color for cellnote text. Defaults to "cyan".
+#' @param notecol (optional) character string specifying the color for cellnote text. Defaults to "cyan". Can be a matrix to personalise each cell.
 #' @param na.color Color to use for missing value (NA). Defaults to the plot background color.
 #' @param trace character string indicating whether a solid "trace" line should be drawn across 'row's or down 'column's, 'both' or 'none'. The distance of the line from the center of each color-cell is proportional to the size of the measurement. Defaults to 'column'.
 #' @param tracecol character string giving the color for "trace" line. Defaults to "cyan".
@@ -116,6 +116,7 @@ environment(plotNode) <- environment(here)
 #' layout	A named list containing the values used for lmat, lhei, and lwid.
 #' @export
 #'
+
 heatmap.2 <- function (x,
 
                        ## dendrogram control
@@ -711,8 +712,8 @@ heatmap.2 <- function (x,
     text(x=c(row(cellnote)),
          y=c(col(cellnote)),
          labels=c(cellnote),
-         col=notecol,
-         cex=notecex)
+         col=c(notecol),
+         cex=c(notecex))
 
   plot.index <- plot.index + 1
 

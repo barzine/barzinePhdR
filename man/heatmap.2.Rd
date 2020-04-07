@@ -69,7 +69,7 @@ heatmap.2(x, Rowv = TRUE, Colv = if (symm) "Rowv" else TRUE,
 
 \item{notecex}{(optional) numeric scaling factor for cellnote items.}
 
-\item{notecol}{(optional) character string specifying the color for cellnote text. Defaults to "cyan".}
+\item{notecol}{(optional) character string specifying the color for cellnote text. Defaults to "cyan". Can be a matrix to personalise each cell.}
 
 \item{na.color}{Color to use for missing value (NA). Defaults to the plot background color.}
 

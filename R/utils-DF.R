@@ -319,6 +319,175 @@ rowCV<-function(DF,digits=1){
 #}
 
 
+#' Gives the maximum value of each row
+#'
+#' @param DF data.frame or matrix
+#' @param type string to indicate how the result should be formatted
+#'             "val" (default) returns the maximum values,
+#'             "ind" returns the indices (as a named vector) of the maximum values,
+#'             "all" returns a data.frame with the maximum value for each row and the indices.
+#'
+#' @return the maximum values and (or) their indices
+#' @export
+#'
+rowMax<-function(DF,type='val'){
+  switch(type,
+         "val"={
+           setNames(sapply(1:nrow(DF), function(x){
+             max(DF[x,])
+           }
+           ),rownames(DF))
+         },
+         "ind"={
+           sapply(1:nrow(DF), function(x){
+             which.max(DF[x,])
+           }
+           )
+         },
+         "all"={
+           tmp<-sapply(1:nrow(DF), function(x){ which.max(DF[x,]) })
+           res<-as.data.frame(cbind(sapply(1:nrow(DF), function(x){ max(DF[x,])}),
+                                    tmp,
+                                    names(tmp)
+           ),stringsAsFactors=FALSE)
+
+           colnames(res)<-c("max",'indice','colname')
+           rownames(res)<-rownames(DF)
+           res[,1]<-as.numeric(res[,1])
+           res[,2]<-as.integer(res[,2])
+           res
+         }
+  )
+}
+
+#' Gives the minimum value of each row
+#'
+#' @param DF data.frame or matrix
+#' @param type string to indicate how the result should be formatted
+#'             "val" (default) returns the minimum values,
+#'             "ind" returns the indices (as a named vector) of the minimum values,
+#'             "all" returns a data.frame with the minimum value for each row and the indices.
+#'
+#' @return the minimum values and (or) their indices
+#' @export
+#'
+rowMin<-function(DF,type='val'){
+  switch(type,
+         "val"={
+           setNames(sapply(1:nrow(DF), function(x){
+             min(DF[x,])
+           }
+           ),rownames(DF))
+         },
+         "ind"={
+           sapply(1:nrow(DF), function(x){
+             which.min(DF[x,])
+           }
+           )
+         },
+         "all"={
+           tmp<-sapply(1:nrow(DF), function(x){ which.min(DF[x,]) })
+           res<-as.data.frame(cbind(sapply(1:nrow(DF), function(x){ min(DF[x,])}),
+                                    tmp,
+                                    names(tmp)
+           ),stringsAsFactors=FALSE)
+
+           colnames(res)<-c("min",'indice','colname')
+           rownames(res)<-rownames(DF)
+           res[,1]<-as.numeric(res[,1])
+           res[,2]<-as.integer(res[,2])
+           res
+         }
+  )
+}
+
+
+#' Gives the maximum value of each column
+#'
+#' @param DF data.frame or matrix
+#' @param type string to indicate how the result should be formatted
+#'             "val" (default) returns the maximum values,
+#'             "ind" returns the indices (as a named vector) of the maximum values,
+#'             "all" returns a data.frame with the maximum value for each column and the indices.
+#'
+#' @return the maximum values and (or) their indices
+#' @export
+#'
+colMax<-function(DF,type='val'){
+  switch(type,
+         "val"={
+           setNames(sapply(1:ncol(DF), function(x){
+             max(c(DF[,x]))
+           }
+           ),colnames(DF))
+         },
+         "ind"={
+           tmp<-sapply(1:ncol(DF), function(x){
+             which.max(c(DF[,x]))
+           })
+           return(setNames(tmp,rownames(DF)[tmp]))
+         },
+         "all"={
+           tmp<-sapply(1:ncol(DF), function(x){
+             which.max(c(DF[,x]))
+           })
+           res<-as.data.frame(cbind("max"=sapply(1:ncol(DF), function(x){ max(c(DF[,x]))}),
+                                    "indice"=tmp,
+                                    "rowname"=rownames(DF)[tmp]
+           ),stringsAsFactors=FALSE)
+           rownames(res)<-colnames(DF)
+           class(res[,1])<-class(DF[,1])
+           res[,2]<-as.integer(res[,2])
+           res
+         }
+  )
+}
+
+
+#' Gives the minimum value of each column
+#'
+#' @param DF data.frame or matrix
+#' @param type string to indicate how the result should be formatted
+#'             "val" (default) returns the minimum values,
+#'             "ind" returns the indices (as a named vector) of the minimum values,
+#'             "all" returns a data.frame with the minimum value for each column and the indices.
+#'
+#' @return the minimum values and (or) their indices
+#' @export
+#'
+colMin<-function(DF,type='val'){
+  switch(type,
+         "val"={
+           setNames(sapply(1:ncol(DF), function(x){
+             min(c(DF[,x]))
+           }
+           ),colnames(DF))
+         },
+         "ind"={
+           tmp<-sapply(1:ncol(DF), function(x){
+             which.min(c(DF[,x]))
+           })
+           return(setNames(tmp,rownames(DF)[tmp]))
+         },
+         "all"={
+           tmp<-sapply(1:ncol(DF), function(x){
+             which.min(c(DF[,x]))
+           })
+           res<-as.data.frame(cbind("min"=sapply(1:ncol(DF), function(x){ min(c(DF[,x]))}),
+                                    "indice"=tmp,
+                                    "rowname"=rownames(DF)[tmp]
+           ),stringsAsFactors=FALSE)
+           rownames(res)<-colnames(DF)
+           class(res[,1])<-class(DF[,1])
+           res[,2]<-as.integer(res[,2])
+           res
+         }
+  )
+}
+
+
+
+
 #' Apply an Hampel's test on a data.frame
 #'
 #' @param DF a numeric data.frame

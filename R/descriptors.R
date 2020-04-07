@@ -110,7 +110,7 @@ nbGenesPerCond.unique<-function(DF, reorder=TRUE, xlab='Tissue',ylab,title,legen
                                 publish=TRUE,threshold=0,thm,Y,remove.legend=FALSE,
                                 legendPosition='bottom', out='DF',print=TRUE){
 
-  uniqNoUniq=setNames(gg_color_hue(2),c('Unique','Not unique'))
+  uniqNoUniq=setNames(gg_color_hue(2),c('Tissue/cell specific','Unspecific to tissue or cell'))
 
   colNames<-colnames(DF) #Genes.ID are going to be added as a column
   names(colNames)<-colnames(DF) #so tempo would be a named list
@@ -133,7 +133,7 @@ nbGenesPerCond.unique<-function(DF, reorder=TRUE, xlab='Tissue',ylab,title,legen
   }else{
     DF<-DF[DF$value %>=% threshold,]
   }
-  DF$unique<-"Not unique"
+  DF$unique<-'Unspecific to tissue or cell'
 
   DF<-Reduce(rbind,lapply(colNames,function (x) {
     DIFF<-base::setdiff(colNames,x) #all the other conditions that will be tested against
@@ -142,13 +142,13 @@ nbGenesPerCond.unique<-function(DF, reorder=TRUE, xlab='Tissue',ylab,title,legen
     VEC<-base::setdiff(names(tempo[[x]]),
                        base::unique(Reduce(c,lapply(DIFF,function(x) names(tempo[[x]])))) )
     if( dim(DF[DF$Genes.ID %in% VEC &DF$variable==x,])[1]>0){
-      DF[DF$Genes.ID %in% VEC &DF$variable==x,]$unique<-'Unique'
+      DF[DF$Genes.ID %in% VEC &DF$variable==x,]$unique<-'Tissue/cell specific'
     }
     DF[DF$variable==x,]
   }))
 
   DF$unique<-as.factor(DF$unique)
-  if("Unique" %in% DF$unique)  DF$unique<-relevel(DF$unique,"Unique")
+  if('Tissue/cell specific' %in% DF$unique)  DF$unique<-relevel(DF$unique,'Tissue/cell specific')
 
   if(reorder){
     v.order<-sapply(colNames,function(x) length(tempo[[x]]))
@@ -217,7 +217,7 @@ complement2nbGenesPerCond.unique<-function(DF, xlab,ylab,title,legend.title,
                                            out='DF',print=TRUE,facetting='Study',flip=FALSE){
 
 
-  uniqNoUniq=setNames(gg_color_hue(2),c('Unique','Not unique'))
+  uniqNoUniq=setNames(gg_color_hue(2),c('Tissue/cell specific','Unspecific to tissue or cell'))
 
   p <- ggplot(DF, aes_string(x="variable")) + geom_bar(aes(y=..count..,fill=unique))
   p <- p + scale_fill_manual(values=uniqNoUniq,drop=FALSE)
