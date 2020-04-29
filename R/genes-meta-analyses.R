@@ -2416,6 +2416,7 @@ barplotCommonGenesUnique2D<-function(a,b,name,print=TRUE,
 #' @param comp logical; should the breadth of expression be computed first from a numeric DFa
 #' @param threshold numeric, which cutoff of expression has to be used for considering a gene expressed in a tissue or not
 #' @param omit.zero logical; whether the rows with zeros only should be kept or not
+<<<<<<< HEAD
 #' @param type character string. "lim" (default) up to the given number as nbMax, "eq" for the exact breadth given by nbMax
 #'
 #' @return a list that comprises for each column of the inputted data.frame,
@@ -2430,11 +2431,15 @@ ExpressedGeneInTissue<-function(DFa,nbMax=2,type="lim",
                                   threshold=threshold,
                                   omit.zero=omit.zero,typeR='dfBool')
 
+<<<<<<< HEAD
   if(type=="lim") {
     DFa<-DFa[DFa[,naCol]<nbMax+1,]
   }else{#only other option "eq"
     DFa<-DFa[DFa[,naCol]==nbMax,]
   }
+=======
+  DFa<-DFa[DFa[,naCol]<nbMax+1,]
+>>>>>>> aef458e21c372d29fb23925d64f27b5852700d25
   DFa<-DFa[,setdiff(colnames(DFa),naCol)]
 
   DFList<-lapply(setNames(colnames(DFa),colnames(DFa)),
