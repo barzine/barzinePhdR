@@ -2430,6 +2430,7 @@ ExpressedGeneInTissue<-function(DFa,nbMax=2,type="lim",
                                   threshold=threshold,
                                   omit.zero=omit.zero,typeR='dfBool')
 
+
   if(type=="lim") {
     DFa<-DFa[DFa[,naCol]<nbMax+1,]
   }else{#only other option "eq"
