@@ -467,7 +467,8 @@ overlapSpeProtmRNA<-function(DFprot,DFmRNA,pretreatment=FALSE,
                                    limit<-ratio*lg
                                    tmp<-as.data.frame(lapply(setNames(conditionCnter,conditionCnter), function(y){
                                      list2comp<-rownames(DFmRNA[order(DFmRNA[,y],decreasing = TRUE),])[1:limit]
-                                     jaccardInd(uniqueProt,list2comp,universeSize=nbGenes,pvalue=TRUE,figure=FALSE)
+                                     jaccardInd(uniqueProt,list2comp,universeSize=nbGenes,pvalue=TRUE,figure=FALSE,
+                                                outputType="pval")
                                    }))
                                  }))
       rownames(resDF)<-conditionCnter
