@@ -19,6 +19,7 @@ environment:
   # USE_RTOOLS: true
   # R_REMOTES_STANDALONE: true
   global:
+      WARNINGS_ARE_ERRORS:
       _R_CHECK_FORCE_SUGGESTS_: false
       BIOC_USE_DEVEL: "FALSE"
       GCC_PATH: mingw_64
