@@ -172,7 +172,7 @@ t_test.CorrMat_identical.vs.different<-function(CorrMat,label.A,label.B,report=T
   identical<-identical[order(identical$Correlation,decreasing=TRUE),]
   estimateDF=data.frame(Type=c('Same-tissue pairs','Different tissues pairs'),
                         Correlation=test$estimate)
-  cat.html(test)
+  if(report) cat.html(test)
 
   p<-ggplot2::ggplot(DFtest,aes(Type,Correlation))+geom_boxplot()+ annotate('text',label=paste('p-value=',
                                                                                                signif(test$p.value,digits=8)),

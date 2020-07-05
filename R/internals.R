@@ -1,4 +1,4 @@
-prep<-function(DF,threshold,label,midLabel,endLabel,out){
+prep<-function(DF,threshold,label,midLabel,endLabel,out='DF'){
 
   DF<-extractSpe(DF,threshold,verbose=TRUE,format='lg')
 
