@@ -309,7 +309,8 @@ t_test.Mat_identical.vs.different<-function(Mat,yLab,
 #' @param saveFile path (character string). Default: NA. Allows to save the figure (if figure=TRUE) at the given path.
 #' @param outputType character string. Whether "index" to return the Jaccard index;
 #'                                     "pval" for the p-value associated or
-#'                                     "list" for a list comprising the index and the pvalue.
+#'                                     "list" for a list comprising the index and the pvalue,
+#'                                     "intersect" intersection of the two lists.
 #' @param ... other parameters for grDevices::cairo_pdf
 #'
 #'
@@ -379,9 +380,10 @@ jaccardInd<-function(list1,list2,universeSize,pvalue=FALSE,
   }
 
   switch(outputType,
-         "index" = return(jInd),
-         "pval"  = return(pval),
-         "list"  = return(list("index"=jInd,"pval"=pval))
+         "index"    = return(jInd),
+         "pval"     = return(pval),
+         "list"     = return(list("index"=jInd,"pval"=pval)),
+         "intersect"= return(intersect(list1,list2))
          )
 }
 

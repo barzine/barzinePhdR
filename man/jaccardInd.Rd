@@ -36,7 +36,8 @@ jaccardInd(list1, list2, universeSize, pvalue = FALSE, indexSignif = 2,
 
 \item{outputType}{character string. Whether "index" to return the Jaccard index;
 "pval" for the p-value associated or
-"list" for a list comprising the index and the pvalue.}
+"list" for a list comprising the index and the pvalue,
+"intersect" intersection of the two lists.}
 
 \item{...}{other parameters for grDevices::cairo_pdf}
 }
