@@ -351,6 +351,7 @@ jaccardInd<-function(list1,list2,universeSize,pvalue=FALSE,
   if(figure){
     p<-VennDiagram::draw.pairwise.venn(ind=FALSE,
                           fontfamily=policeFont,
+                          cat.fontfamily=policeFont,
                           area1=NbPossibleSuccesses,
                           area2=Nbdraws,
                           cross.area=Inter,
