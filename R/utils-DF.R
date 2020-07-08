@@ -507,7 +507,7 @@ hampel.test<-function(DF,bool=TRUE,threshold=5.2,...){
       medx<-stats::median(unlist(DF[x,]))
       madx<-stats::mad(unlist(DF[x,],...))
       if(madx>0){
-        return(abs(DF[x,]-medx)>t*madx)
+        return(abs(DF[x,]-medx)>threshold*madx)
       }else{
         return(0)
       }
