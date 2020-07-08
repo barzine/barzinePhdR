@@ -30,6 +30,8 @@ sortUhlenClassInOne(notExpressed, threshold, NotDetected, Enriched,
 \item{outfilename}{filename for the resulting data.frame to be saved with}
 
 \item{gene.mapID}{Map of the gene names with their Ensembl ids}
+
+\item{precomputed}{logical, whether to search for recorded data}
 }
 \value{
 a data.frame with all the genes annotated with their "Uhlén-like" classification.
