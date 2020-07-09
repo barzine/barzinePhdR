@@ -775,7 +775,7 @@ enhancedTissue<-function(DF,fold=5,detect=FALSE,threshold=1,clean=TRUE){
 #'
 sortUhlenClassInOne<-function(notExpressed,threshold,NotDetected,Enriched,
                               Enhanced,ubiHigh,ubiLow,mixedHigh,mixedLow,
-                              outfilename,gene.mapID){
+                              outfilename,gene.mapID,precomputed=FALSE){
 
   if(precomputed){
     if(isTRUE(grep('.RData',notExpressed[1]))) notExpressed<-Load(notExpressed)
