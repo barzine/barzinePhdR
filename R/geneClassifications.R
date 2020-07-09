@@ -365,7 +365,11 @@ ubi.high<-function(DF,threshold=10.0){
       x[c(length(x))]
     }
   })
-  return(unname(Reduce(c,list.high)))
+  if(length(list.high)>0) {
+    return(unname(Reduce(c,list.high)))
+  }else{
+    return(character(0))
+  }
 }
 
 
@@ -386,7 +390,11 @@ ubi.low<-function(DF,threshold=10,detect=1){
       x[c(length(x))]
     }
   })
-  return(unname(Reduce(c,list.low)))
+  if(length(list.low)>0){
+    return(unname(Reduce(c,list.low)))
+  }else{
+    return(character(0))
+  }
 }
 
 #' Provide the list of mixed high genes
