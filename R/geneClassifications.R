@@ -921,16 +921,16 @@ sortUhlenClassInOne<-function(notExpressed,threshold,NotDetected,Enriched,
     }
   }
 
-  if(!base::missing(notDetected)){
-    if(length(notDetected)>0){
-      notDetected<-notDetected[!(notDetected %in% remNames)]
+  if(!base::missing(NotDetected)){
+    if(length(NotDetected)>0){
+      NotDetected<-NotDetected[!(NotDetected %in% remNames)]
       DF<-rbind(DF,
-                data.frame(GeneID=notDetected,Name=gene.mapID[notDetected],
+                data.frame(GeneID=NotDetected,Name=gene.mapID[NotDetected],
                            Class='Not detected',Tissues='None',stringsAsFactors = FALSE))
       rownames(DF)<-DF$GeneID
     }else{
       DF<-rbind(DF,
-                data.frame(GeneID='NoNotDetected',
+                data.frame(GeneID='NoneNotDetected',
                            Name=NA,Class='Not detected',
                            Tissues=NA,stringsAsFactors = FALSE))
     }

@@ -6,7 +6,8 @@
 from previous gene classification ("Uhlén-like) analysis}
 \usage{
 sortUhlenClassInOne(notExpressed, threshold, NotDetected, Enriched,
-  Enhanced, ubiHigh, ubiLow, mixedHigh, mixedLow, outfilename, gene.mapID)
+  Enhanced, ubiHigh, ubiLow, mixedHigh, mixedLow, outfilename, gene.mapID,
+  precomputed = FALSE)
 }
 \arguments{
 \item{notExpressed}{object, or filename}
