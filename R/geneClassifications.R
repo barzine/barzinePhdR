@@ -901,7 +901,7 @@ sortUhlenClassInOne<-function(notExpressed,threshold,NotDetected,Enriched,
       mixedLow<-mixedLow[!(names(mixedLow) %in% remNames)]
       DF<-rbind(DF,
                 data.frame(GeneID=names(mixedLow),
-                           Name=gene.mapID[names(mixedLow)],
+                           Name=gene.mapID[names(mixedLox)],
                            Class='Lowly expressed ubiquitously',
                            Tissues=mixedLow,stringsAsFactors = FALSE))
       rownames(DF)<-DF$GeneID
