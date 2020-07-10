@@ -816,86 +816,82 @@ sortUhlenClassInOne<-function(notExpressed,threshold,NotDetected,Enriched,
     }else{
       DF<-addEmptyDF(DF,gene="NoEnriched",Class="Tissue Enriched")
     }
-
-    if(any(!is.na(DF$GeneID))){
-      rownames(DF)<-DF$GeneID
-      remNames<-DF$GeneID
-    }else{
-      remNames<-'dummy.token'
-    }
   }
 
   if(!missing(Enhanced)){
     if(length(Enhanced)){
-      Enhanced<-Enhanced[!(names(Enhanced) %in% remNames)]
-      DF<-rbind(DF,
-                data.frame(GeneID=names(Enhanced),
-                           Name=gene.mapID[names(Enhanced)],
-                           Class='T/G Enhanced',
-                           Tissues=Enhanced,stringsAsFactors = FALSE))
-      rownames(DF)<-DF$GeneID
-      remNames<-rownames(DF)
-    }else{
+      Enhanced<-Enhanced[!(names(Enhanced) %in% DF$GeneID)]
+      if(length(Enhanced)) DF<-rbind(DF,
+                                     data.frame(GeneID=names(Enhanced),
+                                     Name=gene.mapID[names(Enhanced)],
+                                     Class='T/G Enhanced',
+                                     Tissues=Enhanced,
+                                     stringsAsFactors = FALSE))
+    }
+    if(!length(Enhanced)){
       DF<-addEmptyDF(DF,gene='NoEnhanced',Class='T/G Enhanced')
     }
   }
 
    if(!missing(ubiHigh)){
      if(length(ubiHigh)){
-       ubiHigh<-ubiHigh[!(ubiHigh %in% remNames)]
-       DF<-rbind(DF,
-                 data.frame(GeneID=ubiHigh,
-                            Name=gene.mapID[ubiHigh],
-                            Class='Highly expressed ubiquitously',
-                            Tissues='All',stringsAsFactors = FALSE))
-       rownames(DF)<-DF$GeneID
-       remNames<-rownames(DF)
-     }else{
+       ubiHigh<-ubiHigh[!(ubiHigh %in%  DF$GeneID)]
+       if(length(ubiHigh)) DF<-rbind(DF,
+                                     data.frame(GeneID=ubiHigh,
+                                     Name=gene.mapID[ubiHigh],
+                                     Class='Highly expressed ubiquitously',
+                                     Tissues='All',
+                                     stringsAsFactors = FALSE))
+
+     }
+     if(!length(ubiHigh)){
        DF<-addEmptyDF(DF,gene='NoUbiHigh',Class='Highly expressed ubiquitously')
      }
    }
 
   if(!missing(ubiLow)){
     if(length(ubiLow)){
-      ubiLow<-ubiLow[!(ubiLow %in% remNames)]
-      DF<-rbind(DF,
-                data.frame(GeneID=ubiLow,
-                           Name=gene.mapID[ubiLow],
-                           Class='Lowly expressed ubiquitously',
-                           Tissues='All',stringsAsFactors = FALSE))
-      rownames(DF)<-DF$GeneID
-      remNames<-rownames(DF)
-    }else{
+      ubiLow<-ubiLow[!(ubiLow %in% DF$GeneID)]
+      if(length(ubiLow)) DF<-rbind(DF,
+                                   data.frame(GeneID=ubiLow,
+                                   Name=gene.mapID[ubiLow],
+                                   Class='Lowly expressed ubiquitously',
+                                   Tissues='All',
+                                   stringsAsFactors = FALSE))
+
+    }
+    if(!length(ubiLow)){
       DF<-addEmptyDF(DF,gene='NoUbiLow', Class='Lowly expressed ubiquitously')
     }
   }
 
   if(!missing(mixedHigh)){
     if(length(mixedHigh)){
-      mixedHigh<-mixedHigh[!(names(mixedHigh) %in% remNames)]
-      DF<-rbind(DF,
-                data.frame(GeneID=names(mixedHigh),
-                           Name=gene.mapID[names(mixedHigh)],
-                           Class='Highly expressed when detected',
-                           Tissues=mixedHigh,stringsAsFactors = FALSE))
-      rownames(DF)<-DF$GeneID
-      remNames<-rownames(DF)
-    }else{
+      mixedHigh<-mixedHigh[!(names(mixedHigh) %in% DF$GeneID)]
+      if(length(mixedHigh)) DF<-rbind(DF,
+                                       data.frame(GeneID=names(mixedHigh),
+                                       Name=gene.mapID[names(mixedHigh)],
+                                       Class='Highly expressed when detected',
+                                       Tissues=mixedHigh,
+                                       stringsAsFactors = FALSE))
+    }
+    if(!length(mixedHigh)){
       DF<-addEmptyDF(DF,gene='NoMixedHigh',Class='Highly expressed when detected')
     }
   }
 
   if(!missing(mixedLow)){
     if(length(mixedLow)){
-      mixedLow<-mixedLow[!(names(mixedLow) %in% remNames)]
-      DF<-rbind(DF,
-                data.frame(GeneID=names(mixedLow),
-                           Name=gene.mapID[names(mixedLow)],
-                           Class='Lowly expressed ubiquitously',
-                           Tissues=mixedLow,stringsAsFactors = FALSE))
-      rownames(DF)<-DF$GeneID
-      remNames<-rownames(DF)
-    }else{
+      mixedLow<-mixedLow[!(names(mixedLow) %in% DF$GeneID)]
+      if(length(mixedLow)) DF<-rbind(DF,
+                                     data.frame(GeneID=names(mixedLow),
+                                     Name=gene.mapID[names(mixedLow)],
+                                     Class='Lowly expressed ubiquitously',
+                                     Tissues=mixedLow,
+                                     stringsAsFactors = FALSE))
+
+    }
+    if(!length(mixedLow)){
       DF<-addEmptyDF(DF,gene='NoMixedLow',Class="Lowly expressed ubiquitously")
     }
   }
@@ -903,14 +899,15 @@ sortUhlenClassInOne<-function(notExpressed,threshold,NotDetected,Enriched,
   if(threshold>0){#otherwise the same as not detected
     if(!missing(notExpressed)){
       if(length(notExpressed)){
-        notExpressed<-notExpressed[!(notExpressed %in% remNames)]
-        DF<-rbind(DF,
-                  data.frame(GeneID=notExpressed,Name=gene.mapID[notExpressed],
-                             Class=paste('Not expressed at',threshold),
-                             Tissues='None',stringsAsFactors = FALSE))
-        rownames(DF)<-DF$GeneID
-        remNames<-rownames(DF)
-      }else{
+        notExpressed<-notExpressed[!(notExpressed %in%  DF$GeneID)]
+        if(length(notExpressed)) DF<-rbind(DF,
+                                           data.frame(GeneID=notExpressed,
+                                           Name=gene.mapID[notExpressed],
+                                           Class=paste('Not expressed at',threshold),
+                                           Tissues='None',stringsAsFactors = FALSE))
+
+      }
+      if(!length(notExpressed)){
         DF<-addEmptyDF(DF, gene='NogeneNotExpressed',Class=paste('Not expressed at',threshold))
       }
     }
@@ -918,17 +915,23 @@ sortUhlenClassInOne<-function(notExpressed,threshold,NotDetected,Enriched,
 
   if(!missing(NotDetected)){
     if(length(NotDetected)){
-      NotDetected<-NotDetected[!(NotDetected %in% remNames)]
-      DF<-rbind(DF,
-                data.frame(GeneID=NotDetected,Name=gene.mapID[NotDetected],
-                           Class='Not detected',Tissues='None',stringsAsFactors = FALSE))
-      rownames(DF)<-DF$GeneID
-    }else{
+      NotDetected<-NotDetected[!(NotDetected %in% DF$GeneID)]
+      if(length(NotDetected)) DF<-rbind(DF,
+                                        data.frame(GeneID=NotDetected,
+                                                   Name=gene.mapID[NotDetected],
+                                                   Class='Not detected',
+                                                   Tissues='None',stringsAsFactors = FALSE))
+    }
+    if(!length(notDetected)){
       DF<-rbind(DF,
                 data.frame(GeneID='NoneNotDetected',
                            Name=NA,Class='Not detected',
                            Tissues=NA,stringsAsFactors = FALSE))
     }
+  }
+
+  if(any(!is.na(DF$GeneID))){
+    rownames(DF)<-DF$GeneID
   }
 
   if(!missing(outfilename)) saveToFile(DF,filename = outfilename)
