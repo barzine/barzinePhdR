@@ -44,7 +44,8 @@ Default: "setNames(c("Protein/mRNA pairs",  "mRNA/mRNA pairs ('ideal' reference)
 \item{sizeLine}{positive numeric. Size of the lines of the plot}
 
 \item{palette}{named vector of character strings. Allows to customise the colours on the plot.
-Names should be identical to the categories or to the content of labelVec.}
+Names should be identical to the categories or to the content of labelVec
+and the last one is per convention the reference.}
 
 \item{legendText}{positive numeric. Size of the legend text. Default: 0.92}
 

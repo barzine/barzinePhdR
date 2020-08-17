@@ -797,7 +797,7 @@ sortUhlenClassInOne<-function(notExpressed,threshold,NotDetected,Enriched,
 
   if(precomputed){
     if(isTRUE(grep('.RData',notExpressed[1]))) notExpressed<-Load(notExpressed)
-    if(isTRUE(grep('.RData',notDetected[1]))) NotDetected<-Load(NotDetected)
+    if(isTRUE(grep('.RData',NotDetected[1]))) NotDetected<-Load(NotDetected)
     if(isTRUE(grep('.RData',Enriched[1]))) Enriched<-Load(Enriched)
     if(isTRUE(grep('.RData',Enhanced[1]))) Enhanced<-Load(Enhanced)
     if(isTRUE(grep('.RData',ubiHigh[1]))) ubiHigh<-Load(ubiHigh)
@@ -922,7 +922,7 @@ sortUhlenClassInOne<-function(notExpressed,threshold,NotDetected,Enriched,
                                                    Class='Not detected',
                                                    Tissues='None',stringsAsFactors = FALSE))
     }
-    if(!length(notDetected)){
+    if(!length(NotDetected)){
       DF<-rbind(DF,
                 data.frame(GeneID='NoneNotDetected',
                            Name=NA,Class='Not detected',
