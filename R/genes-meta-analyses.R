@@ -756,34 +756,34 @@ cumulSpeSimulAggregated<-function(cor1,breadthExp,simul1,reference,cor2,simul2,
   }
   if(!missing(simul2)){
     listDataNames[[length(listDataNames)+1]]<-'simul2'
-    listDataID[[length(listDataID)+1]]<-row.names(cor2)
+    listDataID[[length(listDataID)+1]]<-row.names(simul2)
   }
   listDataID[[length(listDataID)+1]]<-names(breadthExp)
   commonID<-do.call("Intersect",listDataID)
   maxSeq<-length(commonID)
 
-  vecList<-list(simpleVecSpe(cleanupVec(cor1[commonID],commonID),breadthExp)/1:maxSeq) #collect objects to be plotted
+  vecList<-list(simpleVecSpe(cleanupVec(cor1,commonID),breadthExp)/1:maxSeq) #collect objects to be plotted
   colNamesDF<-'Cor'
 
   if(!missing(simul1)){
     if(is.data.frame(simul1)){
-      tempList<-lapply(colnames(simul1),function(x){
-        return(simpleVecSpe(cleanupVec(setNames(simul1[commonID,x],rownames(simul1[commonID,])),commonID),breadthExp))
-      })
-      tempList<-as.data.frame(tempList)
-      vecList[[length(vecList)+1]]<-eval(call(name=aggregMethod,tempList))/1:maxSeq
-      if(!missing(simul2)){
-        colNamesDF[length(colNamesDF)+1]<-"simul1"
-      }else{
-        colNamesDF[length(colNamesDF)+1]<-"Simul"
-      }
+
+      sim1<-apply(simul1,2,sort)
+      sim1<-eval(call(name=aggregMethod,as.matrix(sim1)))
+      vecList[[length(vecList)+1]]<-simpleVecSpe(cleanupVec(sim1,commonID),breadthExp)/1:maxSeq
+
+      #tempList<-lapply(colnames(simul1),function(x){
+      #  return(simpleVecSpe(cleanupVec(setNames(simul1[commonID,x],rownames(simul1[commonID,])),commonID),breadthExp))
+      #})
+      #tempList<-as.data.frame(tempList)
+      #vecList[[length(vecList)+1]]<-eval(call(name=aggregMethod,tempList))/1:maxSeq
     }else{
       vecList[[length(vecList)+1]]<-simpleVecSpe(cleanupVec(simul1,commonID),breadthExp)/1:maxSeq
-      if(!missing(simul2)){
-        colNamesDF[length(colNamesDF)+1]<-"simul1"
-      }else{
-        colNamesDF[length(colNamesDF)+1]<-"Simul"
-      }
+    }
+    if(!missing(simul2)){
+      colNamesDF[length(colNamesDF)+1]<-"simul1"
+    }else{
+      colNamesDF[length(colNamesDF)+1]<-"Simul"
     }
   }
 
@@ -799,15 +799,18 @@ cumulSpeSimulAggregated<-function(cor1,breadthExp,simul1,reference,cor2,simul2,
 
   if(!missing(simul2)){
     if(is.data.frame(simul2)){
-      tempList<-lapply(colnames(simul2),function(x){
-        return(simpleVecSpe(cleanupVec(setNames(simul2[commonID,x],rownames(simul2[commonID,])),commonID),breadthExp))
-      })
-      vecList[[length(vecList)+1]]<-eval(call(name=aggregMethod,tempList))/1:maxSeq
-      colNamesDF[length(colNamesDF)+1]<-"simul2"
+      sim2<-apply(simul2,2,sort)
+      sim2<-eval(call(name=aggregMethod,as.matrix(sim2)))
+      vecList[[length(vecList)+1]]<-simpleVecSpe(cleanupVec(sim2,commonID),breadthExp)/1:maxSeq
+
+      #tempList<-lapply(colnames(simul2),function(x){
+      #  return(simpleVecSpe(cleanupVec(setNames(simul2[commonID,x],rownames(simul2[commonID,])),commonID),breadthExp))
+      #})
+      #vecList[[length(vecList)+1]]<-eval(call(name=aggregMethod,tempList))/1:maxSeq
     }else{
       vecList[[length(vecList)+1]]<-simpleVecSpe(cleanupVec(simul2,commonID),breadthExp)/1:maxSeq
-      colNamesDF[length(colNamesDF)+1]<-"simul2"
     }
+    colNamesDF[length(colNamesDF)+1]<-"simul2"
   }
 
   DF<-as.data.frame(vecList,stringsAsFactors=FALSE)
@@ -917,7 +920,8 @@ cumulSpeSimulAggregated<-function(cor1,breadthExp,simul1,reference,cor2,simul2,
 #'                           "Randomised Protein/mRNA pairs"), c('Cor','reference','simul1'))"
 #' @param sizeLine positive numeric. Size of the lines of the plot
 #' @param palette named vector of character strings. Allows to customise the colours on the plot.
-#'                Names should be identical to the categories or to the content of labelVec.
+#'                Names should be identical to the categories or to the content of labelVec
+#'                and the last one is per convention the reference.
 #' @param legendText positive numeric. Size of the legend text. Default: 0.92
 #' @param base_family  character string. Name of the font to use. Default: "Linux Libertine"
 #' @param base_size positive numeric. Size of the font to use as a base.
@@ -995,13 +999,21 @@ replotCumulSpeSimulAggregated<-function(DF_long,cor1,reference,Title,
     if(!missing(simul1)){
       CorDF<-data.frame(Ranked.cor=index,
                         Cor=sort(cor1[commonID],decreasing=TRUE),
-                        Comparison=categoriesNames[1])
+                        Comparison=categoriesNames[1],stringsAsFactors =FALSE)
 
       if(!aggregateBool) {
-        CorDF<-rbind(CorDF,
-                     data.frame(Ranked.cor=index,
-                                Cor=sort(simul1[commonID,sample(ncol(simul1),1)],decreasing=TRUE),
-                                Comparison=categoriesNames[2],stringsAsFactors =FALSE))
+        if(!is.vector(simul1)){
+          CorDF<-rbind(CorDF,
+                       data.frame(Ranked.cor=index,
+                                  Cor=sort(simul1[commonID,sample(ncol(simul1),1)],decreasing=TRUE),
+                                  Comparison=categoriesNames[2],stringsAsFactors =FALSE))
+        }else{
+          CorDF<-rbind(CorDF,
+                       data.frame(Ranked.cor=index,
+                                  Cor=sort(simul1[commonID],decreasing=TRUE),
+                                  Comparison=categoriesNames[2],stringsAsFactors =FALSE))
+        }
+
       }else{
         simul1<-simul1[commonID,]
         sim1<-apply(simul1,2,sort)
@@ -1012,10 +1024,48 @@ replotCumulSpeSimulAggregated<-function(DF_long,cor1,reference,Title,
                                 Cor=sim1,
                                 Comparison=categoriesNames[2],stringsAsFactors =FALSE))
       }
+    }
+
+    if(!missing(cor2)){
       CorDF<-rbind(CorDF,
                    data.frame(Ranked.cor=index,
-                              Cor=sort(reference[commonID],decreasing=TRUE),
-                              Comparison=categoriesNames[length(categoriesNames)]))
+                              Cor=sort(cor2[commonID],decreasing=TRUE),
+                              Comparison=categoriesNames[3],stringsAsFactors =FALSE))
+    }
+
+    if(!missing(simul2)){
+        if(!aggregateBool) {
+          if(!is.vector(simul2)){
+            CorDF<-rbind(CorDF,
+                         data.frame(Ranked.cor=index,
+                                    Cor=sort(simul2[commonID,sample(ncol(simul2),1)],decreasing=TRUE),
+                                    Comparison=categoriesNames[4],stringsAsFactors =FALSE))
+          }else{
+            CorDF<-rbind(CorDF,
+                         data.frame(Ranked.cor=index,
+                                    Cor=sort(simul2[commonID],decreasing=TRUE),
+                                    Comparison=categoriesNames[4],stringsAsFactors =FALSE))
+          }
+
+        }else{
+          simul2<-simul2[commonID,]
+          sim2<-apply(simul2,2,sort)
+          sim2<-eval(call(name=aggregMethod,as.matrix(sim2)))
+          sim2<-sort(sim1,decreasing = TRUE)
+          CorDF<-rbind(CorDF,
+                       data.frame(Ranked.cor=index,
+                                  Cor=sim1,
+                                  Comparison=categoriesNames[4],stringsAsFactors =FALSE))
+        }
+
+      #addition of the reference to the plot
+      if(!missing(reference)){
+        CorDF<-rbind(CorDF,
+                     data.frame(Ranked.cor=index,
+                                Cor=sort(reference[commonID],decreasing=TRUE),
+                                Comparison=categoriesNames[length(categoriesNames)]))
+      }
+
 
       p1<-ggplot(CorDF,aes(x=as.numeric(Ranked.cor),y=Cor,group=Comparison,colour=Comparison))+geom_line(size=1)+ylab(label = 'Correlation')+xlab('Ranks')
     }else{
