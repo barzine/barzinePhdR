@@ -171,10 +171,12 @@ wrap.compute_permuted_corQ_save<-function(DF1,DF2,
 #' @param legendText numeric. Size of the legend text.
 #' @param ColPalette vector of character string to customise
 #'                   the colours of "cor1", "cor2","simul1",...
+#' @param precomputed boolean. Default:FALSE. Whether the data for the plot is already provided by CorDF
+#' @param CorDF data.frame already computed by a previous
 #'
 #' @param geneList vector of character string. Gene identifiers that should be included in the figure.
 #'                 default: common ids between cor1, cor2, simul1, simul2 and ref
-#' @param out character string. Either "point" or "density"
+#' @param out character string. Either "point", "point_DF" or "density"
 #'
 #' @return a figure
 #' @export
@@ -192,100 +194,112 @@ sortedGenesCorr<-function(cor1,cor2,ref,simul1,simul2,
                           legendText=0.92,
                           ColPalette,
                           geneList,
+                          precomputed=FALSE,
+                          CorDF,
                           out='point'){
 
   set.seed(seed)
 
-  if(missing(ColPalette)){
-    if(missing(cor2)){
-      ColPalette<-setNames(c('plum','grey68','forestgreen'),
-                           c("Protein/mRNA pairs",
-                             "Randomised Protein/mRNA pairs",
-                             "mRNA/mRNA pairs ('ideal' reference)"))
+  if(!precomputed){
+    if(missing(ColPalette)){
+      if(missing(cor2)){
+        ColPalette<-setNames(c('plum','grey68','forestgreen'),
+                             c("Protein/mRNA pairs",
+                               "Randomised Protein/mRNA pairs",
+                               "mRNA/mRNA pairs ('ideal' reference)"))
+        }else{
+          ColPalette<-setNames(c('plum','grey68','plum1','grey81','lightgreen'),
+                               c(paste0('Protein/mRNA pairs: Pandey',unit,'/Uhl\u00e9n'),
+                                 paste0('Randomised Protein/mRNA pairs: Pandey',unit,'/Uhl\u00e9n'),
+                                 paste0('Protein/mRNA pairs: Pandey',unit,'/GTEx'),
+                                 paste0('Randomised Protein/mRNA pairs: Pandey',unit,'/GTEx'),
+                                 "Reference: Uhl\u00e9n mRNA/GTEx mRNA pairs ('ideal' case)"))
+        }
+      }
+
+    categoriesNames<-names(ColPalette)
+
+    if(!missing(cor2)){
+      commonNames<-Intersect(names(cor1),names(cor2),names(ref))
     }else{
-      ColPalette<-setNames(c('plum','grey68','plum1','grey81','lightgreen'),
-                           c(paste0('Protein/mRNA pairs: Pandey',unit,'/Uhl\u00e9n'),
-                             paste0('Randomised Protein/mRNA pairs: Pandey',unit,'/Uhl\u00e9n'),
-                             paste0('Protein/mRNA pairs: Pandey',unit,'/GTEx'),
-                             paste0('Randomised Protein/mRNA pairs: Pandey',unit,'/GTEx'),
-                             "Reference: Uhl\u00e9n mRNA/GTEx mRNA pairs ('ideal' case)"))
+      commonNames<-intersect(names(cor1),names(ref))
     }
-  }
 
-  categoriesNames<-names(ColPalette)
+    if(!missing(geneList)) commonNames<-geneList
 
-  if(!missing(cor2)){
-    commonNames<-Intersect(names(cor1),names(cor2),names(ref))
+    maxSeq<-length(commonNames)
+    index<-1:maxSeq
+
+    CorDF<-data.frame(Ranked.cor=index,
+                      Cor=sort(cor1[commonNames],decreasing=TRUE),
+                      Comparison=categoriesNames[1])
+
+    if(!missing(cor2)){
+      CorDF<-rbind(CorDF,
+                   data.frame(Ranked.cor=index,
+                              Cor=sort(cor2[commonNames],decreasing=TRUE),
+                              Comparison=categoriesNames[3]))
+    }
+
+    if(!missing(simul1)){
+      if(!aggregateBool) {
+        CorDF<-rbind(CorDF,
+                     data.frame(Ranked.cor=index,
+                                Cor=sort(simul1[commonNames,sample(ncol(simul1),1)],decreasing=TRUE),
+                                Comparison=categoriesNames[2],stringsAsFactors =FALSE))
+      }else{
+        simul1<-simul1[commonNames,]
+        sim1<-apply(simul1,2,sort)
+        sim1<-eval(call(name=aggregMethod,as.matrix(sim1)))
+        sim1<-sort(sim1,decreasing = TRUE)
+        CorDF<-rbind(CorDF,
+                     data.frame(Ranked.cor=index,
+                                Cor=sim1,
+                                Comparison=categoriesNames[2],stringsAsFactors =FALSE))
+      }
+    }
+
+    if(!missing(simul2)){
+      if(!aggregateBool){
+        CorDF<-rbind(CorDF,
+                     data.frame(Ranked.cor=index,
+                                Cor=sort(simul2[commonNames,sample(ncol(simul2),1)],decreasing=TRUE),
+                                Comparison=categoriesNames[4]))
+      }else{
+        simul2<-simul2[commonNames,]
+        sim2<-apply(simul2,2,sort)
+        sim2<-eval(call(name=aggregMethod,as.matrix(sim2)))
+        sim2<-sort(sim2,decreasing = TRUE)
+        CorDF<-rbind(CorDF,
+                     data.frame(Ranked.cor=index,
+                                Cor=sim2,
+                                Comparison=categoriesNames[4],stringsAsFactors =FALSE))
+      }
+    }
+
+    if(!missing(ref)){
+      CorDF<-rbind(CorDF,
+                   data.frame(Ranked.cor=index,
+                              Cor=sort(ref[commonNames],decreasing=TRUE),
+                              Comparison=categoriesNames[length(categoriesNames)],
+                            stringsAsFactors =FALSE))
+    }
+
+    CorDF<-as.data.frame(CorDF)
   }else{
-    commonNames<-intersect(names(cor1),names(ref))
+    warning("using the data.frame provided through 'CorDF' argument")
   }
 
-  if(!missing(geneList)) commonNames<-geneList
-
-  maxSeq<-length(commonNames)
-  index<-1:maxSeq
-
-  CorDF<-data.frame(Ranked.cor=index,
-                    Cor=sort(cor1[commonNames],decreasing=TRUE),
-                    Comparison=categoriesNames[1])
-
-  if(!missing(cor2)){
-    CorDF<-rbind(CorDF,
-                 data.frame(Ranked.cor=index,
-                            Cor=sort(cor2[commonNames],decreasing=TRUE),
-                            Comparison=categoriesNames[3]))
-  }
-
-  if(!missing(simul1)){
-    if(!aggregateBool) {
-      CorDF<-rbind(CorDF,
-                   data.frame(Ranked.cor=index,
-                              Cor=sort(simul1[commonNames,sample(ncol(simul1),1)],decreasing=TRUE),
-                              Comparison=categoriesNames[2],stringsAsFactors =FALSE))
-    }else{
-      simul1<-simul1[commonNames,]
-      sim1<-apply(simul1,2,sort)
-      sim1<-eval(call(name=aggregMethod,as.matrix(sim1)))
-      sim1<-sort(sim1,decreasing = TRUE)
-      CorDF<-rbind(CorDF,
-                   data.frame(Ranked.cor=index,
-                              Cor=sim1,
-                              Comparison=categoriesNames[2],stringsAsFactors =FALSE))
-    }
-  }
-
-  if(!missing(simul2)){
-    if(!aggregateBool){
-      CorDF<-rbind(CorDF,
-                   data.frame(Ranked.cor=index,
-                              Cor=sort(simul2[commonNames,sample(ncol(simul2),1)],decreasing=TRUE),
-                              Comparison=categoriesNames[4]))
-    }else{
-      simul2<-simul2[commonNames,]
-      sim2<-apply(simul2,2,sort)
-      sim2<-eval(call(name=aggregMethod,as.matrix(sim2)))
-      sim2<-sort(sim2,decreasing = TRUE)
-      CorDF<-rbind(CorDF,
-                   data.frame(Ranked.cor=index,
-                              Cor=sim2,
-                              Comparison=categoriesNames[2],stringsAsFactors =FALSE))
-    }
-  }
-  if(!missing(ref)){
-    CorDF<-rbind(CorDF,
-                 data.frame(Ranked.cor=index,
-                            Cor=sort(ref[commonNames],decreasing=TRUE),
-                            Comparison=categoriesNames[length(categoriesNames)]))
-  }
-
-  CorDF<-as.data.frame(CorDF)
-
-  if(out=='point'){
+  if(out %in% c('point','point_DF')){
     Inter05=sum(CorDF[as.character(CorDF$Comparison)==categoriesNames[1],'Cor']>0.5)
     Inter0=sum(CorDF[as.character(CorDF$Comparison)==categoriesNames[1],'Cor']>0)
 
     p<-ggplot(CorDF,aes(x=Ranked.cor,y=Cor,group=Comparison,colour=Comparison))
-    p<-p+guides(color=guide_legend(nrow=2,byrow=TRUE))+guides(color=guide_legend(ncol=1))+theme(legend.position='bottom')
+    if(missing(simul2)){
+      p<-p+guides(color=guide_legend(nrow=2,byrow=TRUE))+guides(color=guide_legend(ncol=1))+theme(legend.position='bottom')
+    }else{
+      p<-p+guides(color=guide_legend(nrow=3,byrow=TRUE))+guides(color=guide_legend(ncol=1))+theme(legend.position='bottom')
+    }
     p<-p+scale_colour_manual(values=ColPalette)
     p<-p+labs(title = title,x=xtitle,y=ytitle)
     p<-p+geom_vline(colour='steelblue1',xintercept=Inter05)
@@ -308,21 +322,28 @@ sortedGenesCorr<-function(cor1,cor2,ref,simul1,simul2,
     }
     gp1<-p+geom_point(alpha=0.15)+theme(plot.title=element_blank(),legend.position="none")#+geom_rangeframe(color='black')
 
-    return(suppressWarnings(grid.arrange(gp1,legend1,ncol=1,heights=c(5,1))))
+    theplot<-suppressWarnings(grid.arrange(gp1,legend1,ncol=1,heights=c(5,1)))
+    if(out=="point") return(theplot)
+    if(out=="point_DF"){
+      print(theplot)
+      return(CorDF)
+    }
+    return()
   }else{
     if(out=='density'){
-      #if(!missing(cor2)){
-      #  legend1<-g_legend(p+geom_density()+theme(legend.margin=margin(c(0,0,0,1)))+guides(color=guide_legend(ncol=2)))
-      #}else{
-      #  legend1<-g_legend(p+geom_density()+theme(legend.margin=margin(c(0,0,0,1))))
-      #}
-      #gp1<-p+geom_density(alpha=0.15)+theme(legend.position="none")
 
-      #return(suppressWarnings(grid.arrange(gp1,legend1,ncol=1,heights=c(5,1))))
-
-      p<-ggplot(CorDF,aes(x=Cor,group=Comparison,colour=Comparison))+geom_density()
-      p<-p+guides(color=guide_legend(nrow=2,byrow=TRUE))+guides(color=guide_legend(ncol=1))+theme(legend.position='bottom')
-      p<-p+scale_colour_manual(values=ColPalette)
+      p<-ggplot(CorDF,aes(x=Cor,group=Comparison,colour=Comparison,fill=Comparison))+geom_density()
+      if(missing(simul2)){
+        p<-p+guides(color=guide_legend(nrow=2,byrow=TRUE))+guides(color=guide_legend(ncol=1))+theme(legend.position='bottom')
+      }else{
+        p<-p+guides(color=guide_legend(nrow=5,byrow=TRUE))+guides(color=guide_legend(ncol=1))+theme(legend.position='bottom')
+      }
+      p<-p+scale_colour_manual(values=ColPalette)+xlab(xtitle)
+      if(!ytitle==''){
+        p<-p+ylab(ytitle)
+      }else{
+        p<-p+ylab("density")
+      }
       return(p)
 
     }else{
@@ -767,16 +788,11 @@ cumulSpeSimulAggregated<-function(cor1,breadthExp,simul1,reference,cor2,simul2,
 
   if(!missing(simul1)){
     if(is.data.frame(simul1)){
-
-      sim1<-apply(simul1,2,sort)
-      sim1<-eval(call(name=aggregMethod,as.matrix(sim1)))
-      vecList[[length(vecList)+1]]<-simpleVecSpe(cleanupVec(sim1,commonID),breadthExp)/1:maxSeq
-
-      #tempList<-lapply(colnames(simul1),function(x){
-      #  return(simpleVecSpe(cleanupVec(setNames(simul1[commonID,x],rownames(simul1[commonID,])),commonID),breadthExp))
-      #})
-      #tempList<-as.data.frame(tempList)
-      #vecList[[length(vecList)+1]]<-eval(call(name=aggregMethod,tempList))/1:maxSeq
+      tempList<-lapply(colnames(simul1),function(x){
+        return(simpleVecSpe(cleanupVec(setNames(simul1[commonID,x],rownames(simul1[commonID,])),commonID),breadthExp))
+      })
+      tempList<-as.data.frame(tempList)
+      vecList[[length(vecList)+1]]<-eval(call(name=aggregMethod,tempList))/1:maxSeq
     }else{
       vecList[[length(vecList)+1]]<-simpleVecSpe(cleanupVec(simul1,commonID),breadthExp)/1:maxSeq
     }
@@ -799,14 +815,10 @@ cumulSpeSimulAggregated<-function(cor1,breadthExp,simul1,reference,cor2,simul2,
 
   if(!missing(simul2)){
     if(is.data.frame(simul2)){
-      sim2<-apply(simul2,2,sort)
-      sim2<-eval(call(name=aggregMethod,as.matrix(sim2)))
-      vecList[[length(vecList)+1]]<-simpleVecSpe(cleanupVec(sim2,commonID),breadthExp)/1:maxSeq
-
-      #tempList<-lapply(colnames(simul2),function(x){
-      #  return(simpleVecSpe(cleanupVec(setNames(simul2[commonID,x],rownames(simul2[commonID,])),commonID),breadthExp))
-      #})
-      #vecList[[length(vecList)+1]]<-eval(call(name=aggregMethod,tempList))/1:maxSeq
+      tempList<-lapply(colnames(simul2),function(x){
+        return(simpleVecSpe(cleanupVec(setNames(simul2[commonID,x],rownames(simul2[commonID,])),commonID),breadthExp))
+      })
+      vecList[[length(vecList)+1]]<-eval(call(name=aggregMethod,tempList))/1:maxSeq
     }else{
       vecList[[length(vecList)+1]]<-simpleVecSpe(cleanupVec(simul2,commonID),breadthExp)/1:maxSeq
     }
@@ -1063,7 +1075,7 @@ replotCumulSpeSimulAggregated<-function(DF_long,cor1,reference,Title,
         CorDF<-rbind(CorDF,
                      data.frame(Ranked.cor=index,
                                 Cor=sort(reference[commonID],decreasing=TRUE),
-                                Comparison=categoriesNames[length(categoriesNames)]))
+                                Comparison=categoriesNames[length(categoriesNames)],stringsAsFactors =FALSE))
       }
 
 

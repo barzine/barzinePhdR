@@ -15,6 +15,9 @@
 #' @param binx numeric, bin to use for the marginal plot of the x-axis
 #' @param biny numeric, bin to use for the marginal plot of the y-axis
 #' @param methodcor 'all' for both Spearman and Pearson or or 'spearman' or 'pearson'
+#' @param usecor an optional character string giving a method for computing the correlation in the presence of missing values.
+#'               This must be (an abbreviation of) one of the strings
+#'               "everything", "all.obs", "complete.obs", "na.or.complete", or "pairwise.complete.obs" (default).
 #' @param dens logical, default TRUE. Whether density countour curves should be added to the main figure
 #' @param rug logical, default TRUE. Whether a rug should be added on the main figure
 #' @param geomsize numeric, default 2. the size of the geom_point()
@@ -30,6 +33,8 @@
 #' @param scaleCol colour palette to use for the plot
 #' @param verbose logical; default FALSE
 #' @param smooth logical; default TRUE whether a smooth curve should be plotted
+#' @param smoothMethod string, method to use for the smoothing default: "gam" (from mgcv package)
+#' @param smoothFormula formula to use with the smooth method default: as.formula("y ~ s(x, bs = 'cs')")
 #' @param xmin numeric, minimum of the x-axis
 #' @param ymin numeric, minimum of the y-axis
 #' @param xmax numeric, maximum of the x-axis
@@ -54,9 +59,11 @@
 #'
 scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
                         xcor=3.3,ycor=16.999,binx=0.2,biny=0.2,
-                        methodcor='all',dens=TRUE,rug=TRUE,geomsize=2,
+                        methodcor='all',usecor="pairwise.complete.obs",
+                        dens=TRUE,rug=TRUE,geomsize=2,
                         fig='all',scaleCol,verbose=FALSE,
-                        smooth=TRUE,xmin,ymin,xmax,ymax,abline=TRUE,publi=TRUE,col=NULL,labCol,
+                        smooth=TRUE, smoothMethod="gam", smoothFormula=as.formula("y ~ s(x, bs = 'cs')"),
+                        xmin,ymin,xmax,ymax,abline=TRUE,publi=TRUE,col=NULL,labCol,
                         family='',policeSize=11, sizeLegend=8, sizeCor=3, dealWithSpace=FALSE,
                         p2alpha=1,p3alpha=1){
 
@@ -89,7 +96,6 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
 
   if(missing(xmax)){
     if(missing(max)){
-      #xmax <- 15
       xmax<-base::max(log2(data[,x]+1))+1
     }else{
       xmax<-max
@@ -97,7 +103,6 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
   }
   if(missing(ymax)){
     if (missing(max)) {
-      #ymax <- 15
       ymax <- base::max(log2(data[,y]+1))+1
     }else{
       ymax<-max
@@ -105,7 +110,6 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
   }
   if(missing(xmin)){
     if (missing(min)){
-      #xmin <- -2
       xmin<-base::min(log2(data[,x]+1))-1
     }else{
       xmin <- min
@@ -114,7 +118,6 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
 
   if(missing(ymin)){
     if (missing(min)){
-      #ymin<- -2
       ymin<-base::min(log2(data[,y]+1))-1
     }else{
       ymin<-min
@@ -122,15 +125,15 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
   }
 
   row_sub <- apply(data[,c(x,y)], 1, function(row) all(row !=0 ))
-  data2<-data[row_sub,]
-  if(verbose)   print(paste('removed' ,nrow(data)-nrow(data2)), 'points since 0 in one case')
+  data2   <- data[row_sub,]
+  if(verbose)   print(paste(nrow(data)-nrow(data2), ' points were not plotted since the value was null in one case'))
 
   if (length(col)>0){
-    p<-ggplot(data2, aes_string(x=x2, y=y2, colour=col))
+    p <- ggplot(data2, aes_string(x=x2, y=y2, colour=col))
     if(!missing(scaleCol)){
       p <- p + scale_colour_manual(values=scaleCol)
     }
-    p<- p+geom_point(alpha=a)
+    p <- p + geom_point(alpha=a)
   }else{
     p <- ggplot(data2, aes_string(x=x2, y=y2))
     p <- p+geom_point(alpha=a)
@@ -143,23 +146,43 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
 
   #for the r coefficient (on the graph):
   switch(methodcor,
-         'all'={p <-p + annotate('text' , size=sizeCor,
-                                 label=paste("\u03C1 (Spearman) ="
-                                             ,signif(cor(log2(data[x]+1),log2(data[y]+1),use="pairwise.complete.obs",
-                                                         method='spearman')[1,1],digits=3),
-                                             " ; ","r (Pearson) =",signif(cor(log2(data[x]+1),log2(data[y]+1),use="pairwise.complete.obs",
-                                                                              method='pearson')[1,1],digits=3)),x=xcor,y=ycor)},
-         {p <-p + annotate('text',size=sizeCor, label=paste0("r (",simpleCap(methodcor),") = ",signif(cor(log2(data[x]+1),log2(data[y]+1),
-                                                                                                          use="pairwise.complete.obs",
-                                                                                                          method=methodcor)[1,1],digits=3)),x=xcor,y=ycor)
+         'all'={p <- p + annotate('text',
+                                  family=family,
+                                  size=sizeCor,
+                                  label=paste("\u03C1 (Spearman) =",
+                                              signif(cor(log2(data[x]+1),
+                                                         log2(data[y]+1),
+                                                         use=usecor,
+                                                         method='spearman')[1,1],
+                                                     digits=3),
+                                              " ; ",
+                                              "r (Pearson) =",
+                                              signif(cor(log2(data[x]+1),
+                                                         log2(data[y]+1),
+                                                         use=usecor,
+                                                         method='pearson')[1,1],
+                                                     digits=3)),
+                                  x=xcor,y=ycor)},
+         {p <- p + annotate('text',
+                            family=family,
+                            size=sizeCor,
+                            label=paste0("r (",
+                                         simpleCap(methodcor),
+                                         ") = ",
+                                         signif(cor(log2(data[x]+1),
+                                                    log2(data[y]+1),
+                                                    use=usecor,
+                                                    method=methodcor)[1,1],
+                                                digits=3)),
+                            x=xcor,y=ycor)
          }
   )
 
 
   if(smooth)  p <- p + geom_smooth(aes_string(x=x2,y=y2),
-                                   data=data2,#data[data[,x] > 0 &  data[,y]>0,],
-                                   method="gam",
-                                   formula= y ~ s(x, bs = "cs")
+                                   data=data2,
+                                   method=smoothMethod,
+                                   formula=smoothFormula
   )
   if(dens){#contour (circles are circonvening  area of same points density)
     p <- p + geom_density2d(data=data2,na.rm=TRUE,aes_string(x=x2,y=y2,alpha='..level..', colour=NULL))
@@ -271,6 +294,9 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
 #' @param binx numeric, bin to use for the marginal plot of the x-axis
 #' @param biny numeric, bin to use for the marginal plot of the y-axis
 #' @param methodcor 'all' for both Spearman and Pearson or or 'spearman' or 'pearson'
+#' @param usecor an optional character string giving a method for computing the correlation in the presence of missing values.
+#'               This must be (an abbreviation of) one of the strings
+#'               "everything", "all.obs", "complete.obs", "na.or.complete", or "pairwise.complete.obs" (default).
 #' @param dens logical, default TRUE. Whether density countour curves should be added to the main figure
 #' @param rug logical, default TRUE. Whether a rug should be added on the main figure
 #' @param geomsize numeric, default 2. the size of the geom_point()
@@ -285,6 +311,8 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
 #'           'legend': the legend of the figure only
 #' @param scaleCol colour palette to use for the plot
 #' @param smooth logical; default TRUE whether a smooth curve should be plotted
+#' @param smoothMethod string, method to use for the smoothing default: "gam" (from mgcv package)
+#' @param smoothFormula formula to use with the smooth method default: as.formula("y ~ s(x, bs = 'cs')")
 #' @param xmin numeric, minimum of the x-axis
 #' @param ymin numeric, minimum of the y-axis
 #' @param xmax numeric, maximum of the x-axis
@@ -299,8 +327,10 @@ scatplot.log2<-function(data,x,y,title="",xlabs,ylabs,min,max,a=0.65,
 #'
 scatplot<-function(data,x,y,title,xlabs,ylabs,min,max,a=0.65,log2=TRUE,
                    xcor=3.3,ycor=16.999,binx=0.2,biny=0.2,
-                   methodcor='all',dens=TRUE,rug=TRUE,geomsize=2,fig='all',scaleCol,
-                   smooth=TRUE,xmin,ymin,xmax,ymax,abline=TRUE,publi=TRUE,col=NULL,labCol,
+                   methodcor='all',usecor="pairwise.complete.obs",
+                   dens=TRUE,rug=TRUE,geomsize=2,fig='all',scaleCol,
+                   smooth=TRUE,smoothMethod="gam", smoothFormula=as.formula("y ~ s(x, bs = 'cs')"),
+                   xmin,ymin,xmax,ymax,abline=TRUE,publi=TRUE,col=NULL,labCol,
                    verbose=FALSE){
 
   ##creation of the main plot
@@ -353,7 +383,7 @@ scatplot<-function(data,x,y,title,xlabs,ylabs,min,max,a=0.65,log2=TRUE,
   if(log2){
     row_sub <- apply(data[,c(x,y)], 1, function(row) all(row !=0 ))
     data2<-data[row_sub,]
-    if(verbose)   print(paste('removed' ,nrow(data)-nrow(data2)), 'points since 0 in one case')
+    if(verbose) print(paste(nrow(data)-nrow(data2), ' points were not plotted since the value was null in one case'))
   }else{
     data2<-data
   }
@@ -379,24 +409,66 @@ scatplot<-function(data,x,y,title,xlabs,ylabs,min,max,a=0.65,log2=TRUE,
   #for the r coefficient (on the graph):
   if(log2){
     switch(methodcor,
-           'all'={p <-p + annotate('text',label=paste("\u03C1 (spearman)"
-                                                      ,signif(cor(log2(data[x]+1),log2(data[y]+1),use="pairwise.complete.obs",
-                                                                  method='spearman')[1,1],digits=3),
-                                                      " - ","r (pearson) =",signif(cor(log2(data[x]+1),log2(data[y]+1),use="pairwise.complete.obs",
-                                                                                       method='pearson')[1,1],digits=3)),x=xcor,y=ycor)},
-           {p <-p + annotate('text',label=paste0("r (",methodcor,") = ",signif(cor(log2(data[x]+1),log2(data[y]+1),use="pairwise.complete.obs",
-                                                                                   method=methodcor)[1,1],digits=3)),x=xcor,y=ycor)
+           'all'={p <-p + annotate('text',
+                                   label=paste("\u03C1 (Spearman)",
+                                               signif(cor(log2(data[x]+1),
+                                                          log2(data[y]+1),
+                                                          use=usecor,
+                                                          method='spearman')[1,1],
+                                                      digits=3),
+                                               " ; ",
+                                               "r (Pearson) =",
+                                               signif(cor(log2(data[x]+1),
+                                                          log2(data[y]+1),
+                                                          use=usecor,
+                                                          method='pearson')[1,1],
+                                                      digits=3)),
+                                   x=xcor,
+                                   y=ycor)
+           },
+           {p <- p + annotate('text',
+                              label=paste0("r (",
+                                           simpleCap(methodcor),
+                                           ") = ",
+                                           signif(cor(log2(data[x]+1),
+                                                      log2(data[y]+1),
+                                                      use=usecor,
+                                                      method=methodcor)[1,1],
+                                                  digits=3)),
+                              x=xcor,
+                              y=ycor)
            }
     )
   }else{
     switch(methodcor,
-           'all'={p <-p + annotate('text',label=paste("\u03C1 (spearman)"
-                                                      ,signif(cor(data[x],data[y],use="pairwise.complete.obs",
-                                                                  method='spearman')[1,1],digits=3),
-                                                      " - ","r (pearson) =",signif(cor(data[x],data[y],use="pairwise.complete.obs",
-                                                                                       method='pearson')[1,1],digits=3)),x=xcor,y=ycor)},
-           {p <-p + annotate('text',label=paste0("r (",methodcor,") = ",signif(cor(data[x],data[y],use="pairwise.complete.obs",
-                                                                                   method=methodcor)[1,1],digits=3)),x=xcor,y=ycor)
+           'all'={p <-p + annotate('text',
+                                   label=paste("\u03C1 (Spearman)",
+                                               signif(cor(data[x],
+                                                          data[y],
+                                                          use=usecor,
+                                                                  method='spearman')[1,1],
+                                                      digits=3),
+                                               " ; ",
+                                               "r (Pearson) =",
+                                               signif(cor(data[x],
+                                                          data[y],
+                                                          use=usecor,
+                                                          method='pearson')[1,1],
+                                                      digits=3)),
+                                   x=xcor,
+                                   y=ycor)
+           },
+           {p <-p + annotate('text',
+                             label=paste0("r (",
+                                          simpleCap(methodcor),
+                                          ") = ",
+                                          signif(cor(data[x],
+                                                     data[y],
+                                                     use=usecor,
+                                                     method=methodcor)[1,1],
+                                                 digits=3)),
+                             x=xcor,
+                             y=ycor)
            }
     )
   }
@@ -404,8 +476,8 @@ scatplot<-function(data,x,y,title,xlabs,ylabs,min,max,a=0.65,log2=TRUE,
 
   if(smooth)  p <- p + geom_smooth(aes_string(x=x2,y=y2),
                                    data=data2,#data[data[,x] > 0 &  data[,y]>0,],
-                                   method="gam",
-                                   formula= y ~ s(x, bs = "cs")
+                                   method=smoothMethod,
+                                   formula=smoothFormula
   )
   if(dens){#contour (circles are circonvening  area of same points density)
     p <- p + geom_density2d(data=data2,na.rm=TRUE,aes_string(x=x2,y=y2,alpha='..level..', colour=NULL))

@@ -6,9 +6,11 @@
 \usage{
 scatplot.log2(data, x, y, title = "", xlabs, ylabs, min, max, a = 0.65,
   xcor = 3.3, ycor = 16.999, binx = 0.2, biny = 0.2,
-  methodcor = "all", dens = TRUE, rug = TRUE, geomsize = 2,
-  fig = "all", scaleCol, verbose = FALSE, smooth = TRUE, xmin, ymin,
-  xmax, ymax, abline = TRUE, publi = TRUE, col = NULL, labCol,
+  methodcor = "all", usecor = "pairwise.complete.obs", dens = TRUE,
+  rug = TRUE, geomsize = 2, fig = "all", scaleCol, verbose = FALSE,
+  smooth = TRUE, smoothMethod = "gam",
+  smoothFormula = as.formula("y ~ s(x, bs = 'cs')"), xmin, ymin, xmax,
+  ymax, abline = TRUE, publi = TRUE, col = NULL, labCol,
   family = "", policeSize = 11, sizeLegend = 8, sizeCor = 3,
   dealWithSpace = FALSE, p2alpha = 1, p3alpha = 1)
 }
@@ -41,6 +43,10 @@ scatplot.log2(data, x, y, title = "", xlabs, ylabs, min, max, a = 0.65,
 
 \item{methodcor}{'all' for both Spearman and Pearson or or 'spearman' or 'pearson'}
 
+\item{usecor}{an optional character string giving a method for computing the correlation in the presence of missing values.
+This must be (an abbreviation of) one of the strings
+"everything", "all.obs", "complete.obs", "na.or.complete", or "pairwise.complete.obs" (default).}
+
 \item{dens}{logical, default TRUE. Whether density countour curves should be added to the main figure}
 
 \item{rug}{logical, default TRUE. Whether a rug should be added on the main figure}
@@ -62,6 +68,10 @@ scatplot.log2(data, x, y, title = "", xlabs, ylabs, min, max, a = 0.65,
 \item{verbose}{logical; default FALSE}
 
 \item{smooth}{logical; default TRUE whether a smooth curve should be plotted}
+
+\item{smoothMethod}{string, method to use for the smoothing default: "gam" (from mgcv package)}
+
+\item{smoothFormula}{formula to use with the smooth method default: as.formula("y ~ s(x, bs = 'cs')")}
 
 \item{xmin}{numeric, minimum of the x-axis}
 

@@ -9,7 +9,7 @@ sortedGenesCorr(cor1, cor2, ref, simul1, simul2, seed = 1235,
   xtitle = "Rank (sorted by decreasing order of correlation)",
   ytitle = "", unit = " (PPKM)", base_family = "Linux Libertine",
   base_size = 11, legendText = 0.92, ColPalette, geneList,
-  out = "point")
+  precomputed = FALSE, CorDF, out = "point")
 }
 \arguments{
 \item{cor1}{named numeric vector. Comprises all the correlations between two studies for each genes.}
@@ -48,7 +48,11 @@ the colours of "cor1", "cor2","simul1",...}
 \item{geneList}{vector of character string. Gene identifiers that should be included in the figure.
 default: common ids between cor1, cor2, simul1, simul2 and ref}
 
-\item{out}{character string. Either "point" or "density"}
+\item{precomputed}{boolean. Default:FALSE. Whether the data for the plot is already provided by CorDF}
+
+\item{CorDF}{data.frame already computed by a previous}
+
+\item{out}{character string. Either "point", "point_DF" or "density"}
 }
 \value{
 a figure
